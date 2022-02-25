@@ -48,7 +48,7 @@ class TextDataset(Dataset):
 
             else:
                 with open(file, 'rb') as reader:
-                    ids = pickle.load(file)
+                    ids = pickle.load(reader)
             # store tokens
             self.encoded_tokens.append(ids)
             total_tokens += len(ids)
