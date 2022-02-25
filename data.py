@@ -1,6 +1,7 @@
 from typing import List
 from pathlib import Path
 
+from tqdm import tqdm
 import torch
 from torch.utils.data import Dataset
 
@@ -34,12 +35,12 @@ class TextDataset(Dataset):
 
         total_tokens = 0
 
-        for file in text_files:
+        for file in tqdm(text_files):
             with open(file, 'r', encoding='utf-8') as reader:
                 text = reader.read()
 
             # add SOS and EOS tokens to each document
-            text = "<SOS>" + "<EOS>"
+            text = "<SOS>" + text + "<EOS>"
 
             # encode into tokens
             ids = self.tokenizer.encode(text).ids
@@ -53,7 +54,7 @@ class TextDataset(Dataset):
             self.n_tokens_windows.append(n_windows)
             self.length += n_windows
 
-        print("Loaded dataset of ", total_tokens, "tokens")
+        print("Loaded dataset of", total_tokens, "tokens")
 
     def __len__(self) -> int:
         return self.length
@@ -62,7 +63,7 @@ class TextDataset(Dataset):
         for idx, n_windows in enumerate(self.n_tokens_windows):
             if index < n_windows:  # the index is within this window if it is less than the n_windows
                 token_idx = index * self.stride
-                return self.encoded_tokens[idx][token_idx:token_idx + self.sequence_length]
+                return torch.LongTensor(self.encoded_tokens[idx][token_idx:token_idx + self.sequence_length])
             else:
                 index -= n_windows  # subtract this windowing, move to the next
 
