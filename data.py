@@ -1,4 +1,6 @@
 from typing import List
+from pathlib import Path
+
 import torch
 from torch.utils.data import Dataset
 
@@ -7,7 +9,7 @@ from tokenizers import Tokenizer
 
 class TextDataset(Dataset):
 
-    def __init__(self, text_files: List[str], tokenizer_path: str, sequence_length: int = 128, stride: int = 128):
+    def __init__(self, text_files: List[Path], tokenizer_path: str, sequence_length: int = 128, stride: int = 128):
         """
         A class that holds a basic text dataset in memory in tokenized form, along with the tokenizer
         :param text_files: list of paths to the various text files/documents to use as data
@@ -30,19 +32,28 @@ class TextDataset(Dataset):
         self.sequence_length = sequence_length
         self.stride = stride
 
+        total_tokens = 0
+
         for file in text_files:
             with open(file, 'r', encoding='utf-8') as reader:
                 text = reader.read()
+
+            # add SOS and EOS tokens to each document
+            text = "<SOS>" + "<EOS>"
 
             # encode into tokens
             ids = self.tokenizer.encode(text).ids
             # store tokens
             self.encoded_tokens.append(ids)
+            total_tokens += len(ids)
+
             # store number of possible windows for this file, this is for presenting multiple files as one whole
             # subtract 1 window, for cases of small stride (e.g. stride=1)
             n_windows = ((len(ids) - sequence_length) // stride)
             self.n_tokens_windows.append(n_windows)
             self.length += n_windows
+
+        print("Loaded dataset of ", total_tokens, "tokens")
 
     def __len__(self) -> int:
         return self.length
