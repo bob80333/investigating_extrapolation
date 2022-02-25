@@ -1,23 +1,23 @@
-python --model-size xsmall --position-start-augmentation False --absolute-position-embedding sinusoidal > result_xsmall_noaug_sinusoidal.txt
-python --model-size xsmall --position-start-augmentation False --absolute-position-embedding scaled_sinusoidal  > result_xsmall_noaug_scaled_sinusoidal.txt
-python --model-size xsmall --position-start-augmentation False --absolute-position-embedding learned  > result_xsmall_noaug_learned.txt
-python --model-size xsmall --position-start-augmentation False --absolute-position-embedding none  > result_xsmall_none.txt
-python --model-size xsmall --position-start-augmentation True --absolute-position-embedding sinusoidal  > result_xsmall_aug_sinusoidal.txt
-python --model-size xsmall --position-start-augmentation True --absolute-position-embedding scaled_sinusoidal  > result_xsmall_aug_scaled_sinusoidal.txt
-python --model-size xsmall --position-start-augmentation True --absolute-position-embedding learned > result_xsmall_aug_learned.txt
+python train.py --model-size xsmall --position-start-augmentation False --absolute-position-embedding sinusoidal > result_xsmall_noaug_sinusoidal.txt
+python train.py --model-size xsmall --position-start-augmentation False --absolute-position-embedding scaled_sinusoidal  > result_xsmall_noaug_scaled_sinusoidal.txt
+python train.py --model-size xsmall --position-start-augmentation False --absolute-position-embedding learned  > result_xsmall_noaug_learned.txt
+python train.py --model-size xsmall --position-start-augmentation False --absolute-position-embedding none  > result_xsmall_none.txt
+python train.py --model-size xsmall --position-start-augmentation True --absolute-position-embedding sinusoidal  > result_xsmall_aug_sinusoidal.txt
+python train.py --model-size xsmall --position-start-augmentation True --absolute-position-embedding scaled_sinusoidal  > result_xsmall_aug_scaled_sinusoidal.txt
+python train.py --model-size xsmall --position-start-augmentation True --absolute-position-embedding learned > result_xsmall_aug_learned.txt
 
-python --model-size small --position-start-augmentation False --absolute-position-embedding sinusoidal > result_small_noaug_sinusoidal.txt
-python --model-size small --position-start-augmentation False --absolute-position-embedding scaled_sinusoidal  > result_small_noaug_scaled_sinusoidal.txt
-python --model-size small --position-start-augmentation False --absolute-position-embedding learned  > result_small_noaug_learned.txt
-python --model-size small --position-start-augmentation False --absolute-position-embedding none  > result_small_none.txt
-python --model-size small --position-start-augmentation True --absolute-position-embedding sinusoidal  > result_small_aug_sinusoidal.txt
-python --model-size small --position-start-augmentation True --absolute-position-embedding scaled_sinusoidal  > result_small_aug_scaled_sinusoidal.txt
-python --model-size small --position-start-augmentation True --absolute-position-embedding learned > result_small_aug_learned.txt
+python train.py --model-size small --position-start-augmentation False --absolute-position-embedding sinusoidal > result_small_noaug_sinusoidal.txt
+python train.py --model-size small --position-start-augmentation False --absolute-position-embedding scaled_sinusoidal  > result_small_noaug_scaled_sinusoidal.txt
+python train.py --model-size small --position-start-augmentation False --absolute-position-embedding learned  > result_small_noaug_learned.txt
+python train.py --model-size small --position-start-augmentation False --absolute-position-embedding none  > result_small_none.txt
+python train.py --model-size small --position-start-augmentation True --absolute-position-embedding sinusoidal  > result_small_aug_sinusoidal.txt
+python train.py --model-size small --position-start-augmentation True --absolute-position-embedding scaled_sinusoidal  > result_small_aug_scaled_sinusoidal.txt
+python train.py --model-size small --position-start-augmentation True --absolute-position-embedding learned > result_small_aug_learned.txt
 
-python --model-size medium --position-start-augmentation False --absolute-position-embedding sinusoidal > result_medium_noaug_sinusoidal.txt
-python --model-size medium --position-start-augmentation False --absolute-position-embedding scaled_sinusoidal  > result_medium_noaug_scaled_sinusoidal.txt
-python --model-size medium --position-start-augmentation False --absolute-position-embedding learned  > result_medium_noaug_learned.txt
-python --model-size medium --position-start-augmentation False --absolute-position-embedding none  > result_medium_none.txt
-python --model-size medium --position-start-augmentation True --absolute-position-embedding sinusoidal  > result_medium_aug_sinusoidal.txt
-python --model-size medium --position-start-augmentation True --absolute-position-embedding scaled_sinusoidal  > result_medium_aug_scaled_sinusoidal.txt
-python --model-size medium --position-start-augmentation True --absolute-position-embedding learned > result_medium_aug_learned.txt
+python train.py --model-size medium --position-start-augmentation False --absolute-position-embedding sinusoidal > result_medium_noaug_sinusoidal.txt
+python train.py --model-size medium --position-start-augmentation False --absolute-position-embedding scaled_sinusoidal  > result_medium_noaug_scaled_sinusoidal.txt
+python train.py --model-size medium --position-start-augmentation False --absolute-position-embedding learned  > result_medium_noaug_learned.txt
+python train.py --model-size medium --position-start-augmentation False --absolute-position-embedding none  > result_medium_none.txt
+python train.py --model-size medium --position-start-augmentation True --absolute-position-embedding sinusoidal  > result_medium_aug_sinusoidal.txt
+python train.py --model-size medium --position-start-augmentation True --absolute-position-embedding scaled_sinusoidal  > result_medium_aug_scaled_sinusoidal.txt
+python train.py --model-size medium --position-start-augmentation True --absolute-position-embedding learned > result_medium_aug_learned.txt
