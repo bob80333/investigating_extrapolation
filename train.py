@@ -49,7 +49,7 @@ if __name__ == "__main__":
     else:
         raise Exception("invalid model choice")
 
-    model = Encoder(8192, width, n_layers, n_heads, width * 2, 0.1, torch.device("cuda"), args.max_context_length,
+    model = Encoder(16384, width, n_layers, n_heads, width * 2, 0.1, torch.device("cuda"), args.max_context_length,
                     args.absolute_position_embedding).cuda()
 
     total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
