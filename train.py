@@ -53,9 +53,10 @@ if __name__ == "__main__":
                     args.absolute_position_embedding).cuda()
 
     total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    non_embedding_params = sum(
+        p.numel() for n, p in model.named_parameters() if p.requires_grad and "embedding" not in n)
 
-    print(total_params)
-
-    print("Initialized transformer model with", (total_params // 10_000) / 100, "M parameters")
+    print("Initialized transformer model with", total_params, "total parameters")
+    print("Total non-embedding parameters:", non_embedding_params)
 
     optimizer = optim.Adam(model.parameters(), lr=6e-4, betas=(0.9, 0.95), eps=1e-8, weight_decay=0.1)
