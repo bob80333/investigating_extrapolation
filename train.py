@@ -86,8 +86,8 @@ if __name__ == "__main__":
 
     optimizer = optim.Adam(model.parameters(), lr=6e-4, betas=(0.9, 0.95), eps=1e-8, weight_decay=0.1)
 
-    train_dataset = TextDataset(list(Path("ao3_small_dataset/train").rglob("*.md")), "byte_tokenized_16k.json",
-                                args.train_context_length, args.train_context_length)
+    train_dataset = TextDataset(list(Path("ao3_small_dataset/train").rglob("*.tok")), "byte_tokenized_16k.json",
+                                args.train_context_length, args.train_context_length, pretokenized=True)
 
     train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=2,
                                   drop_last=True)
@@ -132,8 +132,9 @@ if __name__ == "__main__":
         if step % 100 == 0:
             print(f"Step: {step}\t Loss: {loss.item():.3f}")
 
-    valid_datasets = [TextDataset(list(Path("ao3_small_dataset/valid").rglob("*.md")), "byte_tokenized_16k.json",
-                                  test_length, stride=test_length) for test_length in args.test_context_lengths]
+    valid_datasets = [
+        TextDataset(list(Path("ao3_small_dataset/valid").rglob("*.tok")), "byte_tokenized_16k.json", test_length,
+                    stride=test_length, pretokenized=True) for test_length in args.test_context_lengths]
 
     with torch.inference_mode():
         for valid_dataset, test_length in zip(valid_datasets, args.test_context_lengths):
