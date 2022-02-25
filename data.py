@@ -8,6 +8,13 @@ from tokenizers import Tokenizer
 class TextDataset(Dataset):
 
     def __init__(self, text_files: List[str], tokenizer_path: str, sequence_length: int = 128, stride: int = 128):
+        """
+        A class that holds a basic text dataset in memory in tokenized form, along with the tokenizer
+        :param text_files: list of paths to the various text files/documents to use as data
+        :param tokenizer_path: path to huggingface Tokenizers json
+        :param sequence_length: length of sequences to return
+        :param stride: gap between sequences
+        """
         super().__init__()
 
         self.tokenizer = Tokenizer.from_file(tokenizer_path)
@@ -46,7 +53,7 @@ class TextDataset(Dataset):
                 token_idx = index * self.stride
                 return self.encoded_tokens[idx][token_idx:token_idx + self.sequence_length]
             else:
-                index -= n_windows # subtract this windowing, move to the next
+                index -= n_windows  # subtract this windowing, move to the next
 
     def decode(self, ids: List[int]) -> str:
         return self.tokenizer.decode(ids)
