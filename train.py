@@ -130,7 +130,7 @@ if __name__ == "__main__":
 
     valid_datasets = [
         TextDataset(list(Path("ao3_small_dataset/valid").rglob("*.tok")), "byte_tokenized_16k.json", test_length,
-                    stride=test_length, pretokenized=True) for test_length in args.test_context_lengths]
+                    stride=args.train_context_length//2, pretokenized=True) for test_length in args.test_context_lengths]
 
     with torch.inference_mode():
         for valid_dataset, test_length in zip(valid_datasets, args.test_context_lengths):
