@@ -1,1 +1,52 @@
+from typing import List
+import torch
 from torch.utils.data import Dataset
+
+from tokenizers import Tokenizer
+
+
+class TextDataset(Dataset):
+
+    def __init__(self, text_files: List[str], tokenizer_path: str, sequence_length: int = 128, stride: int = 128):
+        super().__init__()
+
+        self.tokenizer = Tokenizer.from_file(tokenizer_path)
+        self.text_files = text_files
+
+        if stride == 0:
+            raise ValueError("Stride must be >= 1, otherwise the same piece of data will be repeated infinite times")
+
+        self.encoded_tokens = []
+        self.n_tokens_windows = []
+
+        self.length = 0
+        self.sequence_length = sequence_length
+        self.stride = stride
+
+        for file in text_files:
+            with open(file, 'r', encoding='utf-8') as reader:
+                text = reader.read()
+
+            # encode into tokens
+            ids = self.tokenizer.encode(text).ids
+            # store tokens
+            self.encoded_tokens.append(ids)
+            # store number of possible windows for this file, this is for presenting multiple files as one whole
+            # subtract 1 window, for cases of small stride (e.g. stride=1)
+            n_windows = ((len(ids) - sequence_length) // stride)
+            self.n_tokens_windows.append(n_windows)
+            self.length += n_windows
+
+    def __len__(self) -> int:
+        return self.length
+
+    def __getitem__(self, index: int) -> torch.LongTensor:
+        for idx, n_windows in enumerate(self.n_tokens_windows):
+            if index < n_windows:  # the index is within this window if it is less than the n_windows
+                token_idx = index * self.stride
+                return self.encoded_tokens[idx][token_idx:token_idx + self.sequence_length]
+            else:
+                index -= n_windows # subtract this windowing, move to the next
+
+    def decode(self, ids: List[int]) -> str:
+        return self.tokenizer.decode(ids)
