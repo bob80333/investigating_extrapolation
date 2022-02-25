@@ -187,6 +187,8 @@ class Encoder(nn.Module):
 
         self.scale = torch.sqrt(torch.FloatTensor([hid_dim])).to(device)
 
+        self.fc_out = nn.Linear(hid_dim, input_dim)
+
     def forward(self, src: torch.FloatTensor, src_mask: torch.FloatTensor) -> torch.FloatTensor:
         # src = [batch size, src len]
         # src_mask = [batch size, 1, 1, src len]
@@ -212,4 +214,5 @@ class Encoder(nn.Module):
 
         # src = [batch size, src len, hid dim]
 
+        src = self.fc_out(src)
         return src
