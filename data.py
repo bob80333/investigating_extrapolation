@@ -1,16 +1,16 @@
-from typing import List
+import pickle
 from pathlib import Path
+from typing import List
 
-from tqdm import tqdm
 import torch
-from torch.utils.data import Dataset
-
 from tokenizers import Tokenizer
+from torch.utils.data import Dataset
+from tqdm import tqdm
 
 
 class TextDataset(Dataset):
 
-    def __init__(self, text_files: List[Path], tokenizer_path: str, sequence_length: int = 128, stride: int = 128):
+    def __init__(self, text_files: List[Path], tokenizer_path: str, sequence_length: int = 128, stride: int = 128, pretokenized: bool = False):
         """
         A class that holds a basic text dataset in memory in tokenized form, along with the tokenizer
         :param text_files: list of paths to the various text files/documents to use as data
@@ -36,14 +36,19 @@ class TextDataset(Dataset):
         total_tokens = 0
 
         for file in tqdm(text_files):
-            with open(file, 'r', encoding='utf-8') as reader:
-                text = reader.read()
+            if not pretokenized:
+                with open(file, 'r', encoding='utf-8') as reader:
+                    text = reader.read()
 
-            # add SOS and EOS tokens to each document
-            text = "<SOS>" + text + "<EOS>"
+                # add SOS and EOS tokens to each document
+                text = "<SOS>" + text + "<EOS>"
 
-            # encode into tokens
-            ids = self.tokenizer.encode(text).ids
+                # encode into tokens
+                ids = self.tokenizer.encode(text).ids
+
+            else:
+                with open(file, 'rb') as reader:
+                    ids = pickle.load(file)
             # store tokens
             self.encoded_tokens.append(ids)
             total_tokens += len(ids)
