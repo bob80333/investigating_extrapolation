@@ -6,6 +6,8 @@ from pathlib import Path
 from tokenizers import Tokenizer
 from tqdm import tqdm
 
+MAX_CHUNK = 128  # increase if you have lots of RAM and cpus
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
@@ -18,26 +20,36 @@ if __name__ == '__main__':
 
     tokenizer = Tokenizer.from_file("byte_tokenized_16k.json")
 
-    texts = []
-
     files = list(Path(args.input_data_directory).rglob("*"+args.input_data_extension))
 
-    print("Loading files")
-    for file in tqdm(files):
-        with open(file, 'r', encoding='utf-8') as reader:
-            texts.append("<SOS>" + reader.read() + "<EOS>")
+    files_chunked = []
 
-    print("Tokenizing all files")
-    start = time.time()
-    tokenized = tokenizer.encode_batch(texts)
-    end = time.time()
-    print("Took", end-start, "to tokenize")
+    num_chunks = (len(files) // MAX_CHUNK) + 1
 
-    print("Saving files")
-    for file, tokens in tqdm(zip(files, tokenized)):
-        file = str(file.absolute()).replace(args.input_data_extension, args.output_data_extension)
+    for i in range(num_chunks):
+        files_chunked.append(files[i*MAX_CHUNK:(i+1)*MAX_CHUNK])
 
-        with open(file, 'wb') as writer:
-            pickle.dump(tokens.ids, writer)
+    for chunk in files_chunked:
+        print("Chunk of", len(chunk))
+        if len(chunk) == 0:
+            break
+        texts = []
+        print("Loading chunk of files")
+        for file in tqdm(chunk):
+            with open(file, 'r', encoding='utf-8') as reader:
+                texts.append("<SOS>" + reader.read() + "<EOS>")
+
+        print("Tokenizing chunk of files")
+        start = time.time()
+        tokenized = tokenizer.encode_batch(texts)
+        end = time.time()
+        print("Took", end-start, "to tokenize")
+
+        print("Saving chunk of files")
+        for file, tokens in tqdm(zip(files, tokenized)):
+            file = str(file.absolute()).replace(args.input_data_extension, args.output_data_extension)
+
+            with open(file, 'wb') as writer:
+                pickle.dump(tokens.ids, writer)
 
     print("Complete")
