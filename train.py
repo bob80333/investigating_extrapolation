@@ -21,7 +21,7 @@ def infinite_dataloader(dataloader: DataLoader) -> torch.LongTensor:
 def build_casual_mask(context_length: int, batch_size: int) -> torch.BoolTensor:
     mask = torch.tril(torch.ones(context_length, context_length))
     # mask.shape = [train_context_length, train_context_length]
-    mask = mask.unsqueeze(0).unsqueeze(0).repeat(batch_size, 1, 1, 1)
+    mask = mask.unsqueeze(0).unsqueeze(0)
     # mask.shape = [batch_size, 1, train_context_length, train_context_length]
     return mask.bool()
 
@@ -37,12 +37,12 @@ if __name__ == "__main__":
     parser.add_argument("--max-context-length", type=int, default=512)
     parser.add_argument("--train-context-length", type=int, default=128)
     parser.add_argument("--test-context-lengths", type=list, default=[128, 144, 160, 192, 256, 384, 512])
-    parser.add_argument("--position-start-augmentation", type=bool, default=True)
+    parser.add_argument("--position-start-augmentation", type=bool, default=False)
 
     parser.add_argument("--absolute-position-embedding", choices=["sinusoidal", "scaled_sinusoidal", "learned", "none"],
                         type=str, default="none")
 
-    parser.add_argument("--num-train-steps", type=int, default=50_000)
+    parser.add_argument("--num-train-steps", type=int, default=1_000)
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--clipping", type=float, default=1.0)
 
@@ -64,7 +64,7 @@ if __name__ == "__main__":
         n_layers = 20
         width = 1280
         n_heads = 20
-    elif args.model_size == "xlarge": # 453.3M non embedding parameters
+    elif args.model_size == "xlarge":  # 453.3M non embedding parameters
         n_layers = 24
         width = 1536
         n_heads = 24
@@ -127,12 +127,12 @@ if __name__ == "__main__":
 
         optimizer.step()
 
-        if step % 100 == 0:
-            print(f"Step: {step}\t Loss: {loss.item():.3f}")
+        if (step+1) % 100 == 0:
+            print(f"Step: {step+1}\t Loss: {loss.item():.3f}")
 
     valid_datasets = [
         TextDataset(list(Path("ao3_small_dataset/valid").rglob("*.tok")), "byte_tokenized_16k.json", test_length,
-                    stride=args.test_length, pretokenized=True) for test_length in args.test_context_lengths]
+                    stride=test_length, pretokenized=True) for test_length in args.test_context_lengths]
 
     with torch.inference_mode():
         for valid_dataset, test_length in zip(valid_datasets, args.test_context_lengths):
