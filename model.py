@@ -3,7 +3,6 @@ from typing import Optional, Tuple
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch import Tensor
 
 from positional_embeddings import SinusoidalEmbeddings, PositionalEmbeddings
 
@@ -25,7 +24,7 @@ class PositionwiseFeedforwardLayer(nn.Module):
     def forward(self, x: torch.FloatTensor) -> torch.FloatTensor:
         # x = [batch size, seq len, hid dim]
 
-        x = self.dropout(F.gelu(self.fc_1(x)))
+        x = self.dropout(F.relu(self.fc_1(x)) ** 2)
 
         # x = [batch size, seq len, pf dim]
 
