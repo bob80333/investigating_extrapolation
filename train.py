@@ -50,19 +50,23 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    if args.model_size == "xsmall":  # 16.8M non embedding parameters
+    if args.model_size == "xsmall":  # 7.1M non embedding parameters
+        n_layers = 6
+        width = 384
+        n_heads = 6
+    elif args.model_size == "small":  # 16.8M non embedding parameters
         n_layers = 8
         width = 512
-        n_heads = 8
-    elif args.model_size == "small":  # 56.7M non embedding parameters
+        n_heads = 12
+    elif args.model_size == "medium":  # 56.7M non embedding parameters
         n_layers = 12
         width = 768
         n_heads = 12
-    elif args.model_size == "medium":  # 134.3M non embedding parameters
+    elif args.model_size == "large":  # 134.3M non embedding parameters
         n_layers = 16
         width = 1024
         n_heads = 16
-    elif args.model_size == "large":  # 262.4M non embedding parameters
+    elif args.model_size == "xlarge":  # 262.4M non embedding parameters
         n_layers = 20
         width = 1280
         n_heads = 20
