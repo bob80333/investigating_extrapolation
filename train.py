@@ -70,10 +70,6 @@ if __name__ == "__main__":
         n_layers = 20
         width = 1280
         n_heads = 20
-    elif args.model_size == "xlarge":  # 453.3M non embedding parameters
-        n_layers = 24
-        width = 1536
-        n_heads = 24
     else:
         raise Exception("invalid model choice")
 
