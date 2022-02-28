@@ -188,16 +188,13 @@ class Encoder(nn.Module):
 
         self.fc_out = nn.Linear(hid_dim, input_dim)
 
-    def forward(self, src: torch.FloatTensor, src_mask: torch.FloatTensor) -> torch.FloatTensor:
+    def forward(self, src: torch.FloatTensor, src_mask: torch.FloatTensor, pos: torch.FloatTensor) -> torch.FloatTensor:
         # src = [batch size, src len]
         # src_mask = [batch size, 1, 1, src len]
+        # pos = [batch size, src len]
 
         batch_size = src.shape[0]
         src_len = src.shape[1]
-
-        pos = torch.arange(0, src_len).unsqueeze(0).repeat(batch_size, 1).to(self.device)
-
-        # pos = [batch size, src len]
 
         src = (self.tok_embedding(src) * self.scale)
 
