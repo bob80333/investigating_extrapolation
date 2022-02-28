@@ -2,6 +2,7 @@ import pickle
 from pathlib import Path
 from typing import List
 
+import numpy as np
 import torch
 from tokenizers import Tokenizer
 from torch.utils.data import Dataset
@@ -48,7 +49,7 @@ class TextDataset(Dataset):
 
             else:
                 with open(file, 'rb') as reader:
-                    ids = pickle.load(reader)
+                    ids = np.array(pickle.load(reader))
             # store tokens
             self.encoded_tokens.append(ids)
             total_tokens += len(ids)
