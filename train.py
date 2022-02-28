@@ -46,6 +46,8 @@ if __name__ == "__main__":
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--clipping", type=float, default=1.0)
 
+    parser.add_argument("--ckpt", type=str, default="ckpt.pt")
+
     args = parser.parse_args()
 
     if args.model_size == "xsmall":  # 16.8M non embedding parameters
@@ -166,3 +168,5 @@ if __name__ == "__main__":
             avg_loss = total_loss / total_samples
             print()
             print(f"Test Length: {test_length}\t Test Loss: {avg_loss:.5f}\t Test Perplexity: {math.exp(avg_loss):.5f}")
+
+    torch.save(model.state_dict(), args.ckpt)
