@@ -1,7 +1,9 @@
 import argparse
 import math
+import pickle
 from pathlib import Path
 
+import numpy as np
 import torch
 import torch.optim as optim
 from torch import LongTensor
@@ -129,19 +131,26 @@ if __name__ == "__main__":
 
         optimizer.step()
 
-        if (step+1) % 100 == 0:
-            print(f"Step: {step+1}\t Loss: {loss.item():.3f}")
+        if (step + 1) % 100 == 0:
+            print(f"Step: {step + 1}\t Loss: {loss.item():.3f}")
 
     valid_datasets = [
-        TextDataset(list(Path("ao3_small_dataset/valid").rglob("*.tok")), "byte_tokenized_8k.json", test_length,
+        TextDataset(list(Path("ao3_small_dataset/valid").rglob("*.tok"))[:10], "byte_tokenized_8k.json", test_length,
                     stride=test_length, pretokenized=True) for test_length in args.test_context_lengths]
 
+    cross_entropy = torch.nn.CrossEntropyLoss(reduction='none')
+
+    all_losses = []
+
+    avg_losses = []
+    median_losses = []
     with torch.inference_mode():
         for valid_dataset, test_length in zip(valid_datasets, args.test_context_lengths):
-            total_loss = 0
-            total_samples = 0
+            losses = np.array(np.zeros((valid_dataset.length, test_length-1)))
 
-            valid_dataloader = DataLoader(valid_dataset, batch_size=args.batch_size, shuffle=False, num_workers=3)
+            current_idx = 0
+
+            valid_dataloader = DataLoader(valid_dataset, batch_size=args.batch_size, shuffle=False, num_workers=2)
             for batch in tqdm(valid_dataloader):
                 batch = batch.cuda()
 
@@ -162,11 +171,27 @@ if __name__ == "__main__":
 
                 loss = cross_entropy(output, targets)
 
-                total_loss += loss.item() * batch_size
-                total_samples += batch_size
+                loss = loss.view(batch_size, -1)
 
-            avg_loss = total_loss / total_samples
-            print()
-            print(f"Test Length: {test_length}\t Test Loss: {avg_loss:.5f}\t Test Perplexity: {math.exp(avg_loss):.5f}")
+                losses[current_idx:current_idx+batch_size, :] = loss.cpu().numpy()
+                current_idx += batch_size
+
+            avg_loss = np.mean(losses)
+            median_loss = np.median(losses)
+
+            avg_losses.append(avg_loss)
+            median_losses.append(median_loss)
+            all_losses.append(losses)
+
+    print()
+    for test_length, avg_loss in zip(args.test_context_lengths, avg_losses):
+        print(f"Test Length: {test_length}\t\tAvg Test Loss: \t\t{avg_loss:.5f}\t\t Avg Test Perplexity: \t\t{math.exp(avg_loss):.5f}")
+
+    print()
+    for test_length, median_loss in zip(args.test_context_lengths, median_losses):
+        print(f"Test Length: {test_length}\t\tMedian Test Loss: \t{median_loss:.5f}\t\t Median Test Perplexity: \t{math.exp(median_loss):.5f}")
+
+    with open(args.ckpt.replace(".pt", "_all_losses.npy"), 'wb') as writer:
+        pickle.dump(losses, writer)
 
     torch.save(model.state_dict(), args.ckpt)
