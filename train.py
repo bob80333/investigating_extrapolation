@@ -34,7 +34,7 @@ if __name__ == "__main__":
                         choices=["xsmall", "small", "medium", "large", "xlarge"], type=str,
                         default="xsmall", help="model sizes")
 
-    parser.add_argument("--max-context-length", type=int, default=512)
+    parser.add_argument("--max-context-length", type=int, default=1024)
     parser.add_argument("--train-context-length", type=int, default=128)
     parser.add_argument("--test-context-lengths", type=list, default=[128, 144, 160, 192, 256, 384, 512, 1024])
     parser.add_argument("--position-start-augmentation", type=bool, default=False)
