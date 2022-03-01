@@ -44,7 +44,7 @@ if __name__ == "__main__":
     parser.add_argument("--absolute-position-embedding", choices=["sinusoidal", "scaled_sinusoidal", "learned", "none"],
                         type=str, default="none")
 
-    parser.add_argument("--num-train-steps", type=int, default=20_000)
+    parser.add_argument("--num-train-steps", type=int, default=10_000)
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--clipping", type=float, default=1.0)
 
