@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    tokenizer = Tokenizer.from_file("byte_tokenized_16k.json")
+    tokenizer = Tokenizer.from_file("byte_tokenized_8k.json")
 
     files = list(Path(args.input_data_directory).rglob("*"+args.input_data_extension))
 
