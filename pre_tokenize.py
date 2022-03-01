@@ -3,6 +3,7 @@ import pickle
 import time
 from pathlib import Path
 
+import numpy as np
 from tokenizers import Tokenizer
 from tqdm import tqdm
 
@@ -50,6 +51,6 @@ if __name__ == '__main__':
             file = str(file.absolute()).replace(args.input_data_extension, args.output_data_extension)
 
             with open(file, 'wb') as writer:
-                pickle.dump(tokens.ids, writer)
+                pickle.dump(np.array(tokens.ids), writer)
 
     print("Complete")
