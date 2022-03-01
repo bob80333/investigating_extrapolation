@@ -73,7 +73,7 @@ if __name__ == "__main__":
     else:
         raise Exception("invalid model choice")
 
-    model = Encoder(16384, width, n_layers, n_heads, width * 2, 0.1, torch.device("cuda"), args.max_context_length,
+    model = Encoder(8192, width, n_layers, n_heads, width * 2, 0.1, torch.device("cuda"), args.max_context_length,
                     args.absolute_position_embedding).cuda()
 
     total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
     optimizer = optim.Adam(model.parameters(), lr=6e-4, betas=(0.9, 0.95), eps=1e-8)
 
-    train_dataset = TextDataset(list(Path("ao3_small_dataset/train").rglob("*.tok")), "byte_tokenized_16k.json",
+    train_dataset = TextDataset(list(Path("ao3_small_dataset/train").rglob("*.tok")), "byte_tokenized_8k.json",
                                 args.train_context_length, args.train_context_length, pretokenized=True)
 
     train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=2,
@@ -133,7 +133,7 @@ if __name__ == "__main__":
             print(f"Step: {step+1}\t Loss: {loss.item():.3f}")
 
     valid_datasets = [
-        TextDataset(list(Path("ao3_small_dataset/valid").rglob("*.tok")), "byte_tokenized_16k.json", test_length,
+        TextDataset(list(Path("ao3_small_dataset/valid").rglob("*.tok")), "byte_tokenized_8k.json", test_length,
                     stride=test_length, pretokenized=True) for test_length in args.test_context_lengths]
 
     with torch.inference_mode():
