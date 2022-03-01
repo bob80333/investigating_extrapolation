@@ -114,7 +114,7 @@ if __name__ == "__main__":
         mask = build_casual_mask(args.train_context_length - 1, args.batch_size).cuda()
         # mask.shape = [batch_size, 1, train_context_length, train_context_length]
 
-        output = model(batch[:, :-1], mask)
+        output = model(batch[:, :-1], mask, positions)
 
         output_dim = output.shape[-1]
 
@@ -153,7 +153,7 @@ if __name__ == "__main__":
                 mask = build_casual_mask(test_length - 1, batch_size).cuda()
                 # mask.shape = [batch_size, 1, test_length-1, test_length-1]
 
-                output = model(batch[:, :-1], mask)
+                output = model(batch[:, :-1], mask, positions)
 
                 output_dim = output.shape[-1]
 
