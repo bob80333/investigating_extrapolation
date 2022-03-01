@@ -46,7 +46,7 @@ if __name__ == '__main__':
         print("Took", end-start, "to tokenize")
 
         print("Saving chunk of files")
-        for file, tokens in tqdm(zip(files, tokenized)):
+        for file, tokens in tqdm(zip(chunk, tokenized)):
             file = str(file.absolute()).replace(args.input_data_extension, args.output_data_extension)
 
             with open(file, 'wb') as writer:
