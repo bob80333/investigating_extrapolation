@@ -136,7 +136,7 @@ if __name__ == "__main__":
             print(f"Step: {step + 1}\t Loss: {loss.item():.3f}")
 
     valid_datasets = [
-        TextDataset(list(Path("ao3_small_dataset/valid").rglob("*.tok"))[:10], "byte_tokenized_8k.json", test_length,
+        TextDataset(list(Path("ao3_small_dataset/valid").rglob("*.tok")), "byte_tokenized_8k.json", test_length,
                     stride=test_length, pretokenized=True) for test_length in args.test_context_lengths]
 
     cross_entropy = torch.nn.CrossEntropyLoss(reduction='none')
