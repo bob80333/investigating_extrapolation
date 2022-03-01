@@ -91,7 +91,8 @@ if __name__ == "__main__":
     train_dataset = TextDataset(list(Path("ao3_small_dataset/train").rglob("*.tok")), "byte_tokenized_8k.json",
                                 args.train_context_length, args.train_context_length, pretokenized=True)
 
-    train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=2,
+    # less than 1 epoch is trained, so to ensure all models see the same data in the same order, shuffling is turned off
+    train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=False, num_workers=2,
                                   drop_last=True)
 
     train_inf_loader: LongTensor = infinite_dataloader(train_dataloader)
@@ -116,7 +117,7 @@ if __name__ == "__main__":
         mask = build_casual_mask(args.train_context_length - 1, args.batch_size).cuda()
         # mask.shape = [batch_size, 1, train_context_length, train_context_length]
 
-        output = model(batch[:, :-1], mask, positions)
+        output = model(batch[:, :-1], mask, positions[:, :-1])
 
         output_dim = output.shape[-1]
 
@@ -162,7 +163,7 @@ if __name__ == "__main__":
                 mask = build_casual_mask(test_length - 1, batch_size).cuda()
                 # mask.shape = [batch_size, 1, test_length-1, test_length-1]
 
-                output = model(batch[:, :-1], mask, positions)
+                output = model(batch[:, :-1], mask, positions[:, :-1])
 
                 output_dim = output.shape[-1]
 
