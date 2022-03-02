@@ -56,10 +56,12 @@ class MultiHeadAttentionLayer(nn.Module):
 
         self.scale = torch.sqrt(torch.FloatTensor([self.head_dim])).to(device)
 
-        # TODO: support both versions of CPB, along with ALIBI and Rotary
+        self.relative_position_embedding = relative_position_embedding
+
+        # TODO: support ALIBI and Rotary
         if relative_position_embedding in ["log_cpb", "linear_cpb"]:
             self.embedding_network: nn.Module = nn.Sequential(
-                nn.Linear(in_features=2, out_features=embedding_network_hidden, bias=True),
+                nn.Linear(in_features=1, out_features=embedding_network_hidden, bias=True),
                 nn.ReLU(inplace=True),
                 nn.Linear(in_features=embedding_network_hidden, out_features=n_heads, bias=True))
         else:
@@ -93,7 +95,9 @@ class MultiHeadAttentionLayer(nn.Module):
 
         energy = torch.matmul(Q, K.permute(0, 1, 3, 2)) / self.scale
 
+        # if embedding network
         if self.embedding_network:
+            # apply relative positional embeddings from SwinV2 (either log or linear)
             energy = energy + self.__get_relative_positional_encodings()
 
         # energy = [batch size, n heads, query len, key len]
@@ -128,23 +132,22 @@ class MultiHeadAttentionLayer(nn.Module):
         """
         Method initializes the pair-wise relative positions to compute the positional biases
         """
-
-        # TODO: change this from a 2d grid of self.window_size to a 1d list of self.sequence length
-        indexes: torch.Tensor = torch.arange(self.window_size, device=self.tau.device)
-        coordinates: torch.Tensor = torch.stack(torch.meshgrid([indexes, indexes]), dim=0)
-        coordinates: torch.Tensor = torch.flatten(coordinates, start_dim=1)
-        relative_coordinates: torch.Tensor = coordinates[:, :, None] - coordinates[:, None, :]
-        relative_coordinates: torch.Tensor = relative_coordinates.permute(1, 2, 0).reshape(-1, 2).float()
-        relative_coordinates_log: torch.Tensor = torch.sign(relative_coordinates) \
-                                                 * torch.log(1. + relative_coordinates.abs())
-        self.register_buffer("relative_coordinates_log", relative_coordinates_log)
+        indexes: torch.Tensor = torch.arange(self.sequence_length, device=self.tau.device)
+        relative_indices: torch.Tensor = indexes[:, None] - indexes[None, :]
+        relative_indices: torch.Tensor = relative_indices.reshape(-1, 1).float()
+        if self.relative_position_embedding == "log_cpb":
+            relative_indices_log: torch.Tensor = torch.sign(relative_indices) \
+                                                     * torch.log(1. + relative_indices.abs())
+            self.register_buffer("relative_indices", relative_indices_log)
+        else:
+            self.register_buffer("relative_indices", relative_indices)
 
     def __get_relative_positional_encodings(self) -> torch.Tensor:
         """
         Method computes the relative positional encodings
         :return: (torch.Tensor) Relative positional encodings [1, number of heads, window size ** 2, window size ** 2]
         """
-        relative_position_bias: torch.Tensor = self.embedding_network(self.relative_coordinates_log)
+        relative_position_bias: torch.Tensor = self.embedding_network(self.relative_indices)
         relative_position_bias: torch.Tensor = relative_position_bias.permute(1, 0)
         relative_position_bias: torch.Tensor = relative_position_bias.reshape(self.number_of_heads,
                                                                               self.sequence_length,
@@ -165,7 +168,7 @@ class EncoderLayer(nn.Module):
 
         self.self_attn_layer_norm = nn.LayerNorm(hid_dim)
         self.ff_layer_norm = nn.LayerNorm(hid_dim)
-        self.self_attention = MultiHeadAttentionLayer(hid_dim, n_heads, dropout, device, relative_position_embedding)
+        self.self_attention = MultiHeadAttentionLayer(hid_dim, n_heads, dropout, device, relative_position_embedding, sequence_length)
         self.positionwise_feedforward = PositionwiseFeedforwardLayer(hid_dim,
                                                                      pf_dim,
                                                                      dropout)
