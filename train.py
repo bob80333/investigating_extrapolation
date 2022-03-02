@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--absolute-position-embedding", choices=["sinusoidal", "scaled_sinusoidal", "learned", "none"],
                         type=str, default="none")
-    parser.add_argument("--relative-position-embedding", choices=["linear_cpb", "log_cpb", "alibi", "rotary", "none"])
+    parser.add_argument("--relative-position-embedding", choices=["linear_cpb", "log_cpb", "fourier_cpb", "alibi", "rotary", "none"])
 
     parser.add_argument("--num-train-steps", type=int, default=10_000)
     parser.add_argument("--batch-size", type=int, default=128)

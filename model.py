@@ -1,11 +1,23 @@
+import math
 from typing import Optional, Tuple
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from einops import rearrange
 
 from positional_embeddings import SinusoidalEmbeddings, PositionalEmbeddings
 
+
+# from lucidrains
+# https://github.com/lucidrains/tf-bind-transformer/blob/main/tf_bind_transformer/tf_bind_transformer.py#L48
+def fourier_encode(x, dims, theta = 20000):
+    device, dtype = x.device, x.dtype
+    emb = math.log(theta) / (dims // 2)
+    emb = torch.exp(torch.arange(dims // 2, device = device) * -emb)
+    emb = rearrange(x, 'n -> n 1') * rearrange(emb, 'd -> 1 d')
+    emb = torch.cat((emb.sin(), emb.cos()), dim = -1)
+    return emb
 
 # transformer model based on Encoder part of this implementation:
 # https://github.com/bentrevett/pytorch-seq2seq/blob/master/6%20-%20Attention%20is%20All%20You%20Need.ipynb
@@ -37,7 +49,7 @@ class PositionwiseFeedforwardLayer(nn.Module):
 
 class MultiHeadAttentionLayer(nn.Module):
     def __init__(self, hid_dim: int, n_heads: int, dropout: float, device: torch.device,
-                 relative_position_embedding: str, sequence_length: int, embedding_network_hidden: int = 256) -> None:
+                 relative_position_embedding: str, sequence_length: int, embedding_network_hidden: int = 256, fourier_dims: int = 16) -> None:
         super().__init__()
 
         assert hid_dim % n_heads == 0
@@ -58,10 +70,18 @@ class MultiHeadAttentionLayer(nn.Module):
 
         self.relative_position_embedding = relative_position_embedding
 
+        self.fourier_dims = fourier_dims
+
         # TODO: support ALIBI and Rotary
         if relative_position_embedding in ["log_cpb", "linear_cpb"]:
             self.embedding_network: nn.Module = nn.Sequential(
                 nn.Linear(in_features=1, out_features=embedding_network_hidden, bias=True),
+                nn.ReLU(inplace=True),
+                nn.Linear(in_features=embedding_network_hidden, out_features=n_heads, bias=True))
+
+        elif relative_position_embedding == "fourier_cpb":
+            self.embedding_network: nn.Module = nn.Sequential(
+                nn.Linear(in_features=fourier_dims, out_features=embedding_network_hidden, bias=True),
                 nn.ReLU(inplace=True),
                 nn.Linear(in_features=embedding_network_hidden, out_features=n_heads, bias=True))
         else:
@@ -143,6 +163,10 @@ class MultiHeadAttentionLayer(nn.Module):
             relative_indices_log: torch.Tensor = torch.sign(relative_indices) \
                                                  * torch.log(1. + relative_indices.abs())
             self.register_buffer("relative_indices", relative_indices_log)
+        elif self.relative_position_embedding == "fourier_cpb":
+            relative_indices = relative_indices.squeeze(1)
+            relative_indices_fourier: torch.Tensor = fourier_encode(relative_indices, self.fourier_dims)
+            self.register_buffer("relative_indices", relative_indices_fourier)
         else:
             self.register_buffer("relative_indices", relative_indices)
 
@@ -165,7 +189,7 @@ class MultiHeadAttentionLayer(nn.Module):
         # Set new window size
         self.sequence_length = new_sequence_length
 
-        if self.relative_position_embedding in ["log_cpb", "linear_cpb"]:
+        if self.relative_position_embedding in ["log_cpb", "linear_cpb", "fourier_cpb"]:
             # Make new relative positions
             self.__make_relative_positions()
 
