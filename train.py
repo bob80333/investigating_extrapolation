@@ -44,6 +44,7 @@ if __name__ == "__main__":
     parser.add_argument("--absolute-position-embedding", choices=["sinusoidal", "scaled_sinusoidal", "learned", "none"],
                         type=str, default="none")
 
+    # TODO: add in new relative position embedding options
     parser.add_argument("--num-train-steps", type=int, default=10_000)
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--clipping", type=float, default=1.0)
@@ -75,6 +76,7 @@ if __name__ == "__main__":
     else:
         raise Exception("invalid model choice")
 
+    # TODO: correctly set model length for training with relative pos embeds
     model = Encoder(8192, width, n_layers, n_heads, width * 2, 0.1, torch.device("cuda"), args.max_context_length,
                     args.absolute_position_embedding).cuda()
 
@@ -145,6 +147,7 @@ if __name__ == "__main__":
 
     avg_losses = []
     median_losses = []
+    # TODO: correctly modify model seq len for relative pos embeds for testing
     with torch.inference_mode():
         for valid_dataset, test_length in zip(valid_datasets, args.test_context_lengths):
             losses = np.array(np.zeros((valid_dataset.length, test_length-1)))
