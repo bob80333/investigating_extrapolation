@@ -55,13 +55,13 @@ but prev experiments showed long context results MUCH more noisy than training c
 
 next set of tests: relative pos embeddings with none for absolute embeddings
 
-python train.py --model-size xsmall --absolute-position-embedding none --linear_cpb --ckpt result_xsmall_none_linear_cpb1.pt > result_xsmall_none_linear_cpb1.txt
-python train.py --model-size xsmall --absolute-position-embedding none --linear_cpb --ckpt result_xsmall_none_linear_cpb2.pt > result_xsmall_none_linear_cpb2.txt
-python train.py --model-size xsmall --absolute-position-embedding none --linear_cpb --ckpt result_xsmall_none_linear_cpb3.pt > result_xsmall_none_linear_cpb3.txt
-python train.py --model-size xsmall --absolute-position-embedding none --linear_cpb --ckpt result_xsmall_none_linear_cpb4.pt > result_xsmall_none_linear_cpb4.txt
-python train.py --model-size xsmall --absolute-position-embedding none --linear_cpb --ckpt result_xsmall_none_linear_cpb5.pt > result_xsmall_none_linear_cpb5.txt
-python train.py --model-size xsmall --absolute-position-embedding none --log_cpb --ckpt result_xsmall_none_log_cpb1.pt > result_xsmall_none_log_cpb1.txt
-python train.py --model-size xsmall --absolute-position-embedding none --log_cpb --ckpt result_xsmall_none_log_cpb2.pt > result_xsmall_none_log_cpb2.txt
-python train.py --model-size xsmall --absolute-position-embedding none --log_cpb --ckpt result_xsmall_none_log_cpb3.pt > result_xsmall_none_log_cpb3.txt
-python train.py --model-size xsmall --absolute-position-embedding none --log_cpb --ckpt result_xsmall_none_log_cpb4.pt > result_xsmall_none_log_cpb4.txt
-python train.py --model-size xsmall --absolute-position-embedding none --log_cpb --ckpt result_xsmall_none_log_cpb5.pt > result_xsmall_none_log_cpb5.txt
+python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding linear_cpb --ckpt result_xsmall_none_linear_cpb1.pt > result_xsmall_none_linear_cpb1.txt
+python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding linear_cpb --ckpt result_xsmall_none_linear_cpb2.pt > result_xsmall_none_linear_cpb2.txt
+python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding linear_cpb --ckpt result_xsmall_none_linear_cpb3.pt > result_xsmall_none_linear_cpb3.txt
+python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding linear_cpb --ckpt result_xsmall_none_linear_cpb4.pt > result_xsmall_none_linear_cpb4.txt
+python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding linear_cpb --ckpt result_xsmall_none_linear_cpb5.pt > result_xsmall_none_linear_cpb5.txt
+python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding log_cpb --ckpt result_xsmall_none_log_cpb1.pt > result_xsmall_none_log_cpb1.txt
+python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding log_cpb --ckpt result_xsmall_none_log_cpb2.pt > result_xsmall_none_log_cpb2.txt
+python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding log_cpb --ckpt result_xsmall_none_log_cpb3.pt > result_xsmall_none_log_cpb3.txt
+python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding log_cpb --ckpt result_xsmall_none_log_cpb4.pt > result_xsmall_none_log_cpb4.txt
+python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding log_cpb --ckpt result_xsmall_none_log_cpb5.pt > result_xsmall_none_log_cpb5.txt
