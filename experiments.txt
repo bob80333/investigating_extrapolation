@@ -24,54 +24,44 @@ python train.py --model-size xsmall --position-start-augmentation True --absolut
 python train.py --model-size xsmall --position-start-augmentation True --absolute-position-embedding learned --ckpt result_xsmall_aug_learned4.pt > result_xsmall_aug_learned4.txt
 python train.py --model-size xsmall --position-start-augmentation True --absolute-position-embedding learned --ckpt result_xsmall_aug_learned5.pt > result_xsmall_aug_learned5.txt
 
-python train.py --model-size small --position-start-augmentation False --absolute-position-embedding sinusoidal --ckpt result_small_noaug_sinusoidal1.pt > result_small_noaug_sinusoidal1.txt
-python train.py --model-size small --position-start-augmentation False --absolute-position-embedding sinusoidal --ckpt result_small_noaug_sinusoidal2.pt > result_small_noaug_sinusoidal2.txt
-python train.py --model-size small --position-start-augmentation False --absolute-position-embedding sinusoidal --ckpt result_small_noaug_sinusoidal3.pt > result_small_noaug_sinusoidal3.txt
-python train.py --model-size small --position-start-augmentation False --absolute-position-embedding sinusoidal --ckpt result_small_noaug_sinusoidal4.pt > result_small_noaug_sinusoidal4.txt
-python train.py --model-size small --position-start-augmentation False --absolute-position-embedding sinusoidal --ckpt result_small_noaug_sinusoidal5.pt > result_small_noaug_sinusoidal5.txt
-python train.py --model-size small --position-start-augmentation False --absolute-position-embedding learned --ckpt result_small_noaug_learned1.pt  > result_small_noaug_learned1.txt
-python train.py --model-size small --position-start-augmentation False --absolute-position-embedding learned --ckpt result_small_noaug_learned2.pt  > result_small_noaug_learned2.txt
-python train.py --model-size small --position-start-augmentation False --absolute-position-embedding learned --ckpt result_small_noaug_learned3.pt  > result_small_noaug_learned3.txt
-python train.py --model-size small --position-start-augmentation False --absolute-position-embedding learned --ckpt result_small_noaug_learned4.pt  > result_small_noaug_learned4.txt
-python train.py --model-size small --position-start-augmentation False --absolute-position-embedding learned --ckpt result_small_noaug_learned5.pt  > result_small_noaug_learned5.txt
-python train.py --model-size small --position-start-augmentation False --absolute-position-embedding none --ckpt result_small_none1.pt  > result_small_none1.txt
-python train.py --model-size small --position-start-augmentation False --absolute-position-embedding none --ckpt result_small_none2.pt  > result_small_none2.txt
-python train.py --model-size small --position-start-augmentation False --absolute-position-embedding none --ckpt result_small_none3.pt  > result_small_none3.txt
-python train.py --model-size small --position-start-augmentation False --absolute-position-embedding none --ckpt result_small_none4.pt  > result_small_none4.txt
-python train.py --model-size small --position-start-augmentation False --absolute-position-embedding none --ckpt result_small_none5.pt  > result_small_none5.txt
-python train.py --model-size small --position-start-augmentation True --absolute-position-embedding sinusoidal --ckpt result_small_aug_sinusoidal1.pt  > result_small_aug_sinusoidal1.txt
-python train.py --model-size small --position-start-augmentation True --absolute-position-embedding sinusoidal --ckpt result_small_aug_sinusoidal2.pt  > result_small_aug_sinusoidal2.txt
-python train.py --model-size small --position-start-augmentation True --absolute-position-embedding sinusoidal --ckpt result_small_aug_sinusoidal3.pt  > result_small_aug_sinusoidal3.txt
-python train.py --model-size small --position-start-augmentation True --absolute-position-embedding sinusoidal --ckpt result_small_aug_sinusoidal4.pt  > result_small_aug_sinusoidal4.txt
-python train.py --model-size small --position-start-augmentation True --absolute-position-embedding sinusoidal --ckpt result_small_aug_sinusoidal5.pt  > result_small_aug_sinusoidal5.txt
-python train.py --model-size small --position-start-augmentation True --absolute-position-embedding learned --ckpt result_small_aug_learned1.pt > result_small_aug_learned1.txt
-python train.py --model-size small --position-start-augmentation True --absolute-position-embedding learned --ckpt result_small_aug_learned2.pt > result_small_aug_learned2.txt
-python train.py --model-size small --position-start-augmentation True --absolute-position-embedding learned --ckpt result_small_aug_learned3.pt > result_small_aug_learned3.txt
-python train.py --model-size small --position-start-augmentation True --absolute-position-embedding learned --ckpt result_small_aug_learned4.pt > result_small_aug_learned4.txt
-python train.py --model-size small --position-start-augmentation True --absolute-position-embedding learned --ckpt result_small_aug_learned5.pt > result_small_aug_learned5.txt
+# after having run the previous experiments, takeaways:
+total avg loss for length 128 across runs:
+none:
+685.3
+learned:
+688.2
+sinusoidal:
+690.23
+aug sinusoidal:
+684.9
+aug learned:
+689.2
 
-python train.py --model-size medium --position-start-augmentation False --absolute-position-embedding sinusoidal --ckpt result_medium_noaug_sinusoidal1.pt > result_medium_noaug_sinusoidal1.txt
-python train.py --model-size medium --position-start-augmentation False --absolute-position-embedding sinusoidal --ckpt result_medium_noaug_sinusoidal2.pt > result_medium_noaug_sinusoidal2.txt
-python train.py --model-size medium --position-start-augmentation False --absolute-position-embedding sinusoidal --ckpt result_medium_noaug_sinusoidal3.pt > result_medium_noaug_sinusoidal3.txt
-python train.py --model-size medium --position-start-augmentation False --absolute-position-embedding sinusoidal --ckpt result_medium_noaug_sinusoidal4.pt > result_medium_noaug_sinusoidal4.txt
-python train.py --model-size medium --position-start-augmentation False --absolute-position-embedding sinusoidal --ckpt result_medium_noaug_sinusoidal5.pt > result_medium_noaug_sinusoidal5.txt
-python train.py --model-size medium --position-start-augmentation False --absolute-position-embedding learned --ckpt result_medium_noaug_learned1.pt  > result_medium_noaug_learned1.txt
-python train.py --model-size medium --position-start-augmentation False --absolute-position-embedding learned --ckpt result_medium_noaug_learned2.pt  > result_medium_noaug_learned2.txt
-python train.py --model-size medium --position-start-augmentation False --absolute-position-embedding learned --ckpt result_medium_noaug_learned3.pt  > result_medium_noaug_learned3.txt
-python train.py --model-size medium --position-start-augmentation False --absolute-position-embedding learned --ckpt result_medium_noaug_learned4.pt  > result_medium_noaug_learned4.txt
-python train.py --model-size medium --position-start-augmentation False --absolute-position-embedding learned --ckpt result_medium_noaug_learned5.pt  > result_medium_noaug_learned5.txt
-python train.py --model-size medium --position-start-augmentation False --absolute-position-embedding none --ckpt result_medium_none1.pt  > result_medium_none1.txt
-python train.py --model-size medium --position-start-augmentation False --absolute-position-embedding none --ckpt result_medium_none2.pt  > result_medium_none2.txt
-python train.py --model-size medium --position-start-augmentation False --absolute-position-embedding none --ckpt result_medium_none3.pt  > result_medium_none3.txt
-python train.py --model-size medium --position-start-augmentation False --absolute-position-embedding none --ckpt result_medium_none4.pt  > result_medium_none4.txt
-python train.py --model-size medium --position-start-augmentation False --absolute-position-embedding none --ckpt result_medium_none5.pt  > result_medium_none5.txt
-python train.py --model-size medium --position-start-augmentation True --absolute-position-embedding sinusoidal --ckpt result_medium_aug_sinusoidal1.pt  > result_medium_aug_sinusoidal1.txt
-python train.py --model-size medium --position-start-augmentation True --absolute-position-embedding sinusoidal --ckpt result_medium_aug_sinusoidal2.pt  > result_medium_aug_sinusoidal2.txt
-python train.py --model-size medium --position-start-augmentation True --absolute-position-embedding sinusoidal --ckpt result_medium_aug_sinusoidal3.pt  > result_medium_aug_sinusoidal3.txt
-python train.py --model-size medium --position-start-augmentation True --absolute-position-embedding sinusoidal --ckpt result_medium_aug_sinusoidal4.pt  > result_medium_aug_sinusoidal4.txt
-python train.py --model-size medium --position-start-augmentation True --absolute-position-embedding sinusoidal --ckpt result_medium_aug_sinusoidal5.pt  > result_medium_aug_sinusoidal5.txt
-python train.py --model-size medium --position-start-augmentation True --absolute-position-embedding learned --ckpt result_medium_aug_learned1.pt > result_medium_aug_learned1.txt
-python train.py --model-size medium --position-start-augmentation True --absolute-position-embedding learned --ckpt result_medium_aug_learned2.pt > result_medium_aug_learned2.txt
-python train.py --model-size medium --position-start-augmentation True --absolute-position-embedding learned --ckpt result_medium_aug_learned3.pt > result_medium_aug_learned3.txt
-python train.py --model-size medium --position-start-augmentation True --absolute-position-embedding learned --ckpt result_medium_aug_learned4.pt > result_medium_aug_learned4.txt
-python train.py --model-size medium --position-start-augmentation True --absolute-position-embedding learned --ckpt result_medium_aug_learned5.pt > result_medium_aug_learned5.txt
+overall:
+
+differences minimal at this model size / training steps / hyperparams
+
+none and aug sinusoidal are potentially the best
+
+but none has an advantage of being much simpler (do nothing)
+
+extra experiments:
+xsmall noaug vs aug learned, 50k steps (x5 training steps)
+
+noaug was ~2.9% better than aug after 50k steps (aug len 128 76.065 avg loss vs noaug len 128 73.881 avg loss)
+
+noaug was significantly better at long context (1024 len) (266.99 vs 298.29 avg loss)
+but prev experiments showed long context results MUCH more noisy than training context results
+
+next set of tests: relative pos embeddings with none for absolute embeddings
+
+python train.py --model-size xsmall --absolute-position-embedding none --linear_cpb --ckpt result_xsmall_none_linear_cpb1.pt > result_xsmall_none_linear_cpb1.txt
+python train.py --model-size xsmall --absolute-position-embedding none --linear_cpb --ckpt result_xsmall_none_linear_cpb2.pt > result_xsmall_none_linear_cpb2.txt
+python train.py --model-size xsmall --absolute-position-embedding none --linear_cpb --ckpt result_xsmall_none_linear_cpb3.pt > result_xsmall_none_linear_cpb3.txt
+python train.py --model-size xsmall --absolute-position-embedding none --linear_cpb --ckpt result_xsmall_none_linear_cpb4.pt > result_xsmall_none_linear_cpb4.txt
+python train.py --model-size xsmall --absolute-position-embedding none --linear_cpb --ckpt result_xsmall_none_linear_cpb5.pt > result_xsmall_none_linear_cpb5.txt
+python train.py --model-size xsmall --absolute-position-embedding none --log_cpb --ckpt result_xsmall_none_log_cpb1.pt > result_xsmall_none_log_cpb1.txt
+python train.py --model-size xsmall --absolute-position-embedding none --log_cpb --ckpt result_xsmall_none_log_cpb2.pt > result_xsmall_none_log_cpb2.txt
+python train.py --model-size xsmall --absolute-position-embedding none --log_cpb --ckpt result_xsmall_none_log_cpb3.pt > result_xsmall_none_log_cpb3.txt
+python train.py --model-size xsmall --absolute-position-embedding none --log_cpb --ckpt result_xsmall_none_log_cpb4.pt > result_xsmall_none_log_cpb4.txt
+python train.py --model-size xsmall --absolute-position-embedding none --log_cpb --ckpt result_xsmall_none_log_cpb5.pt > result_xsmall_none_log_cpb5.txt
