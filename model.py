@@ -36,7 +36,7 @@ class PositionwiseFeedforwardLayer(nn.Module):
 
 
 class MultiHeadAttentionLayer(nn.Module):
-    def __init__(self, hid_dim: int, n_heads: int, dropout: float, device: torch.device) -> None:
+    def __init__(self, hid_dim: int, n_heads: int, dropout: float, device: torch.device, relative_position_embedding: str) -> None:
         super().__init__()
 
         assert hid_dim % n_heads == 0
@@ -108,6 +108,20 @@ class MultiHeadAttentionLayer(nn.Module):
 
         return x, attention
 
+    # from https://github.com/ChristophReich1996/Swin-Transformer-V2/blob/main/swin_transformer_v2/model_parts.py#L149
+    def __make_pair_wise_relative_positions(self) -> None:
+        """
+        Method initializes the pair-wise relative positions to compute the positional biases
+        """
+        indexes: torch.Tensor = torch.arange(self.window_size, device=self.tau.device)
+        coordinates: torch.Tensor = torch.stack(torch.meshgrid([indexes, indexes]), dim=0)
+        coordinates: torch.Tensor = torch.flatten(coordinates, start_dim=1)
+        relative_coordinates: torch.Tensor = coordinates[:, :, None] - coordinates[:, None, :]
+        relative_coordinates: torch.Tensor = relative_coordinates.permute(1, 2, 0).reshape(-1, 2).float()
+        relative_coordinates_log: torch.Tensor = torch.sign(relative_coordinates) \
+                                                 * torch.log(1. + relative_coordinates.abs())
+        self.register_buffer("relative_coordinates_log", relative_coordinates_log)
+
 
 class EncoderLayer(nn.Module):
     def __init__(self,
@@ -115,12 +129,13 @@ class EncoderLayer(nn.Module):
                  n_heads: int,
                  pf_dim: int,
                  dropout: float,
-                 device: torch.device) -> None:
+                 device: torch.device,
+                 relative_position_embedding: str) -> None:
         super().__init__()
 
         self.self_attn_layer_norm = nn.LayerNorm(hid_dim)
         self.ff_layer_norm = nn.LayerNorm(hid_dim)
-        self.self_attention = MultiHeadAttentionLayer(hid_dim, n_heads, dropout, device)
+        self.self_attention = MultiHeadAttentionLayer(hid_dim, n_heads, dropout, device, relative_position_embedding)
         self.positionwise_feedforward = PositionwiseFeedforwardLayer(hid_dim,
                                                                      pf_dim,
                                                                      dropout)
@@ -159,7 +174,8 @@ class Encoder(nn.Module):
                  dropout: float,
                  device: torch.device,
                  max_length: int = 128,
-                 absolute_position_embedding: str = "sinusoidal") -> None:
+                 absolute_position_embedding: str = "sinusoidal",
+                 relative_position_embedding: str = "log_cpb") -> None:
         super().__init__()
 
         self.device = device
@@ -179,7 +195,7 @@ class Encoder(nn.Module):
                                                   n_heads,
                                                   pf_dim,
                                                   dropout,
-                                                  device)
+                                                  device, relative_position_embedding)
                                      for _ in range(n_layers)])
 
         self.dropout = nn.Dropout(dropout)
