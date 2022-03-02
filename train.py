@@ -7,6 +7,7 @@ import numpy as np
 import torch
 import torch.optim as optim
 from torch import LongTensor
+from torch.cuda.amp import autocast, GradScaler
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
@@ -38,7 +39,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--max-context-length", type=int, default=1024)
     parser.add_argument("--train-context-length", type=int, default=128)
-    parser.add_argument("--test-context-lengths", type=list, default=[128, 144, 160, 192, 256, 384, 512, 1024])
+    parser.add_argument("--test-context-lengths", type=list, default=[128, 256, 512, 1024, 2048])
     parser.add_argument("--position-start-augmentation", type=bool, default=False)
 
     parser.add_argument("--absolute-position-embedding", choices=["sinusoidal", "scaled_sinusoidal", "learned", "none"],
@@ -111,6 +112,7 @@ if __name__ == "__main__":
 
     cross_entropy = torch.nn.CrossEntropyLoss()
 
+    scaler = GradScaler()
     for step in tqdm(range(args.num_train_steps)):
         optimizer.zero_grad(set_to_none=True)
 
@@ -128,21 +130,25 @@ if __name__ == "__main__":
 
         mask = build_casual_mask(args.train_context_length - 1, args.batch_size).cuda()
         # mask.shape = [batch_size, 1, train_context_length, train_context_length]
+        with autocast():
+            output = model(batch[:, :-1], mask, positions[:, :-1])
 
-        output = model(batch[:, :-1], mask, positions[:, :-1])
+            output_dim = output.shape[-1]
 
-        output_dim = output.shape[-1]
+            output = output.contiguous().view(-1, output_dim)
+            targets = batch[:, 1:].contiguous().view(-1)
 
-        output = output.contiguous().view(-1, output_dim)
-        targets = batch[:, 1:].contiguous().view(-1)
+            loss = cross_entropy(output, targets)
 
-        loss = cross_entropy(output, targets)
+        scaler.scale(loss).backward()
 
-        loss.backward()
+        scaler.unscale_(optimizer)
 
-        torch.nn.utils.clip_grad_norm(model.parameters(), args.clipping)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), args.clipping)
 
-        optimizer.step()
+        scaler.step(optimizer)
+
+        scaler.update()
 
         if (step + 1) % 100 == 0:
             print(f"Step: {step + 1}\t Loss: {loss.item():.3f}")
@@ -157,13 +163,19 @@ if __name__ == "__main__":
 
     avg_losses = []
     median_losses = []
+
+    max_length_and_batch = 128 * 128
+
+    # get rid of adam??
+    optimizer = None
     with torch.inference_mode():
         for valid_dataset, test_length in zip(valid_datasets, args.test_context_lengths):
             losses = np.array(np.zeros((valid_dataset.length, test_length-1)))
 
             current_idx = 0
 
-            valid_dataloader = DataLoader(valid_dataset, batch_size=args.batch_size, shuffle=False, num_workers=2)
+            valid_dataloader = DataLoader(valid_dataset, batch_size=max_length_and_batch // test_length, shuffle=False,
+                                          num_workers=2)
 
             if args.relative_position_embedding != "none" and args.absolute_position_embedding in ["none", "sinusoidal",
                                                                                                    "scaled_sinusoidal"]:
@@ -180,7 +192,8 @@ if __name__ == "__main__":
                 mask = build_casual_mask(test_length - 1, batch_size).cuda()
                 # mask.shape = [batch_size, 1, test_length-1, test_length-1]
 
-                output = model(batch[:, :-1], mask, positions[:, :-1])
+                with autocast():
+                    output = model(batch[:, :-1], mask, positions[:, :-1])
 
                 output_dim = output.shape[-1]
 
