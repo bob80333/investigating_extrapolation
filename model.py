@@ -128,16 +128,16 @@ class MultiHeadAttentionLayer(nn.Module):
         return x, attention
 
     # from https://github.com/ChristophReich1996/Swin-Transformer-V2/blob/main/swin_transformer_v2/model_parts.py#L149
-    def __make_pair_wise_relative_positions(self) -> None:
+    def __make_relative_positions(self) -> None:
         """
-        Method initializes the pair-wise relative positions to compute the positional biases
+        Method initializes the relative positions to compute the positional biases
         """
         indexes: torch.Tensor = torch.arange(self.sequence_length, device=self.tau.device)
         relative_indices: torch.Tensor = indexes[:, None] - indexes[None, :]
         relative_indices: torch.Tensor = relative_indices.reshape(-1, 1).float()
         if self.relative_position_embedding == "log_cpb":
             relative_indices_log: torch.Tensor = torch.sign(relative_indices) \
-                                                     * torch.log(1. + relative_indices.abs())
+                                                 * torch.log(1. + relative_indices.abs())
             self.register_buffer("relative_indices", relative_indices_log)
         else:
             self.register_buffer("relative_indices", relative_indices)
@@ -147,12 +147,23 @@ class MultiHeadAttentionLayer(nn.Module):
         Method computes the relative positional encodings
         :return: (torch.Tensor) Relative positional encodings [1, number of heads, window size ** 2, window size ** 2]
         """
-        relative_position_bias: torch.Tensor = self.embedding_network(self.relative_indices)
-        relative_position_bias: torch.Tensor = relative_position_bias.permute(1, 0)
-        relative_position_bias: torch.Tensor = relative_position_bias.reshape(self.number_of_heads,
-                                                                              self.sequence_length,
-                                                                              self.sequence_length)
+        relative_position_bias = self.embedding_network(self.relative_indices)
+        relative_position_bias = relative_position_bias.permute(1, 0)
+        relative_position_bias = relative_position_bias.reshape(self.number_of_heads, self.sequence_length,
+                                                                self.sequence_length)
         return relative_position_bias.unsqueeze(0)
+
+    def update_sizes(self, new_sequence_length: int) -> None:
+        """
+        Method updates the sequence length and so the relative positions
+        :param new_sequence_length: (int) New sequence length
+        """
+        # Set new window size
+        self.sequence_length = new_sequence_length
+
+        if self.relative_position_embedding in ["log_cpb", "linear_cpb"]:
+            # Make new relative positions
+            self.__make_relative_positions()
 
 
 class EncoderLayer(nn.Module):
@@ -168,7 +179,8 @@ class EncoderLayer(nn.Module):
 
         self.self_attn_layer_norm = nn.LayerNorm(hid_dim)
         self.ff_layer_norm = nn.LayerNorm(hid_dim)
-        self.self_attention = MultiHeadAttentionLayer(hid_dim, n_heads, dropout, device, relative_position_embedding, sequence_length)
+        self.self_attention = MultiHeadAttentionLayer(hid_dim, n_heads, dropout, device, relative_position_embedding,
+                                                      sequence_length)
         self.positionwise_feedforward = PositionwiseFeedforwardLayer(hid_dim,
                                                                      pf_dim,
                                                                      dropout)
@@ -195,6 +207,13 @@ class EncoderLayer(nn.Module):
         # src = [batch size, src len, hid dim]
 
         return src
+
+    def update_sizes(self, new_sequence_length: int) -> None:
+        """
+        Update the sequence length and thus relative positions
+        :param new_sequence_length: int New sequence length
+        """
+        self.self_attention.update_sizes(new_sequence_length)
 
 
 class Encoder(nn.Module):
@@ -263,3 +282,11 @@ class Encoder(nn.Module):
 
         src = self.fc_out(src)
         return src
+
+    def update_sizes(self, new_sequence_length: int) -> None:
+        """
+        Update the sequence length and thus relative positions
+        :param new_sequence_length: New sequence length
+        """
+        for layer in self.layers:
+            layer.update_sizes(new_sequence_length)
