@@ -69,9 +69,13 @@ class MultiHeadAttentionLayer(nn.Module):
 
         self.sequence_length = sequence_length
 
+        self.update_sizes(sequence_length)
+
     def forward(self, query: torch.FloatTensor, key: torch.FloatTensor, value: torch.FloatTensor,
                 mask: Optional[torch.LongTensor] = None) -> Tuple[torch.FloatTensor, torch.FloatTensor]:
         batch_size = query.shape[0]
+
+        seq_len = query.shape[1]
 
         # query = [batch size, query len, hid dim]
         # key = [batch size, key len, hid dim]
@@ -98,7 +102,7 @@ class MultiHeadAttentionLayer(nn.Module):
         # if embedding network
         if self.embedding_network:
             # apply relative positional embeddings from SwinV2 (either log or linear)
-            energy = energy + self.__get_relative_positional_encodings()
+            energy = energy + self.__get_relative_positional_encodings()[:, :, :seq_len, :seq_len]
 
         # energy = [batch size, n heads, query len, key len]
 
@@ -132,7 +136,7 @@ class MultiHeadAttentionLayer(nn.Module):
         """
         Method initializes the relative positions to compute the positional biases
         """
-        indexes: torch.Tensor = torch.arange(self.sequence_length, device=self.tau.device)
+        indexes: torch.Tensor = torch.arange(self.sequence_length, device=self.scale.device)
         relative_indices: torch.Tensor = indexes[:, None] - indexes[None, :]
         relative_indices: torch.Tensor = relative_indices.reshape(-1, 1).float()
         if self.relative_position_embedding == "log_cpb":
@@ -149,7 +153,7 @@ class MultiHeadAttentionLayer(nn.Module):
         """
         relative_position_bias = self.embedding_network(self.relative_indices)
         relative_position_bias = relative_position_bias.permute(1, 0)
-        relative_position_bias = relative_position_bias.reshape(self.number_of_heads, self.sequence_length,
+        relative_position_bias = relative_position_bias.reshape(self.n_heads, self.sequence_length,
                                                                 self.sequence_length)
         return relative_position_bias.unsqueeze(0)
 
