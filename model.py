@@ -19,6 +19,51 @@ def fourier_encode(x, dims, theta = 20000):
     emb = torch.cat((emb.sin(), emb.cos()), dim = -1)
     return emb
 
+# from lucidrains
+# https://github.com/lucidrains/x-transformers/blob/main/x_transformers/x_transformers.py#L186
+
+def exists(val):
+    return val is not None
+
+class AlibiPositionalBias(nn.Module):
+    def __init__(self, heads, **kwargs):
+        super().__init__()
+        self.heads = heads
+        slopes = torch.Tensor(self._get_slopes(heads))
+        slopes = rearrange(slopes, 'h -> () h () ()')
+        self.register_buffer('slopes', slopes, persistent = False)
+        self.register_buffer('bias', None, persistent = False)
+
+    @staticmethod
+    def _get_slopes(heads):
+        def get_slopes_power_of_2(n):
+            start = (2**(-2**-(math.log2(n)-3)))
+            ratio = start
+            return [start*ratio**i for i in range(n)]
+
+        if math.log2(heads).is_integer():
+            return get_slopes_power_of_2(heads)
+
+        closest_power_of_2 = 2 ** math.floor(math.log2(heads))
+        return get_slopes_power_of_2(closest_power_of_2) + get_slopes_power_of_2(2 * closest_power_of_2)[0::2][:heads-closest_power_of_2]
+
+    def forward(self, qk_dots):
+        h, i, j, device = *qk_dots.shape[-3:], qk_dots.device
+
+        if exists(self.bias) and self.bias.shape[-1] >= j:
+            return qk_dots + self.bias[..., :j]
+
+        bias = torch.arange(j, device = device)
+        bias = rearrange(bias, 'j -> () () () j')
+        bias = bias * self.slopes
+
+        num_heads_unalibied = h - bias.shape[1]
+        bias = F.pad(bias, (0, 0, 0, 0, 0, num_heads_unalibied))
+
+        self.register_buffer('bias', bias, persistent = False)
+        return qk_dots + self.bias
+
+
 # transformer model based on Encoder part of this implementation:
 # https://github.com/bentrevett/pytorch-seq2seq/blob/master/6%20-%20Attention%20is%20All%20You%20Need.ipynb
 # by Ben Trevett, MIT licensed
@@ -72,7 +117,7 @@ class MultiHeadAttentionLayer(nn.Module):
 
         self.fourier_dims = fourier_dims
 
-        # TODO: support ALIBI and Rotary
+        # TODO: support Rotary
         if relative_position_embedding in ["log_cpb", "linear_cpb"]:
             self.embedding_network: nn.Module = nn.Sequential(
                 nn.Linear(in_features=1, out_features=embedding_network_hidden, bias=True),
@@ -86,6 +131,11 @@ class MultiHeadAttentionLayer(nn.Module):
                 nn.Linear(in_features=embedding_network_hidden, out_features=n_heads, bias=True))
         else:
             self.embedding_network = None
+
+        if relative_position_embedding == "alibi":
+            self.alibi_pos_embedding = AlibiPositionalBias(n_heads)
+        else:
+            self.alibi_pos_embedding = None
 
         self.sequence_length = sequence_length
 
@@ -123,6 +173,11 @@ class MultiHeadAttentionLayer(nn.Module):
         if self.embedding_network:
             # apply relative positional embeddings from SwinV2 (either log or linear)
             energy = energy + self.__get_relative_positional_encodings()[:, :, :seq_len, :seq_len]
+
+        # if alibi pos embeddings
+        if self.alibi_pos_embedding:
+            # apply them to the dot product of Q and K
+            energy = self.alibi_pos_embedding(energy)
 
         # energy = [batch size, n heads, query len, key len]
 
