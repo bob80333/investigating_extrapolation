@@ -180,8 +180,8 @@ class MultiHeadAttentionLayer(nn.Module):
         if self.rotary_pos_embedding:
             # apply the rotations to your queries and keys after the heads have been split out,
             # but prior to the dot product and subsequent softmax (attention)
-            Q = self.rotary_pos_embedding.rotate_queries_or_keys(self.freqs, Q)
-            K = self.rotary_pos_embedding.rotate_queries_or_keys(self.freqs, K)
+            Q = self.rotary_pos_embedding.rotate_queries_or_keys(Q)
+            K = self.rotary_pos_embedding.rotate_queries_or_keys(K)
 
         energy = torch.matmul(Q, K.permute(0, 1, 3, 2)) / self.scale
 
