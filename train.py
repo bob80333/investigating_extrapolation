@@ -164,7 +164,7 @@ if __name__ == "__main__":
     avg_losses = []
     median_losses = []
 
-    max_length_and_batch = 128 * 128
+    max_length_and_batch = 128 * 128 * 2
 
     # get rid of adam??
     optimizer = None

@@ -75,3 +75,34 @@ python train.py --model-size xsmall --absolute-position-embedding none --relativ
 python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding alibi --ckpt result_xsmall_none_alibi3.pt > result_xsmall_none_alibi3.txt
 python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding alibi --ckpt result_xsmall_none_alibi4.pt > result_xsmall_none_alibi4.txt
 python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding alibi --ckpt result_xsmall_none_alibi5.pt > result_xsmall_none_alibi5.txt
+
+python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding rotary --ckpt result_xsmall_none_rotary1.pt > result_xsmall_none_rotary1.txt
+python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding rotary --ckpt result_xsmall_none_rotary2.pt > result_xsmall_none_rotary2.txt
+python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding rotary --ckpt result_xsmall_none_rotary3.pt > result_xsmall_none_rotary3.txt
+python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding rotary --ckpt result_xsmall_none_rotary4.pt > result_xsmall_none_rotary4.txt
+python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding rotary --ckpt result_xsmall_none_rotary5.pt > result_xsmall_none_rotary5.txt
+
+avg avg ppl for length 2048 across 5 runs
+linear_cpb:     116.56259 +- 0.93250
+log_cpb:        117.80258 +- 1.20369
+fourier_cpb:    132.80323 +- 2.95787
+alibi:          119.69891 +- 0.79353
+rotary:
+
+
+avg avg ppl for length 128 across 5 runs
+linear_cpb:     119.99844 +- 0.73475
+log_cpb:        120.72210 +- 1.13642
+fourier_cpb:    119.18559 +- 0.98430
+alibi:          123.93904 +- 0.66219
+rotary:
+
+extra notes:
+linear_cpb advantage over log_cpb actually increases from length 128 to 2048 (~.72 lower ppl to ~1.24 lower ppl)
+linear_cpb seems to have lower stdev than the other cpb methods (more consistent)
+at training length:
+    fourier_cpb is better than log_cpb
+    linear_cpb is somewhere between, stdev too large to know
+at length 2048
+    fourier_cpb is definitely much worse than both log and linear cpb
+    linear_cpb is probably better than log_cpb

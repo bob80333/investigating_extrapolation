@@ -5,19 +5,21 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange
+from rotary_embedding_torch import apply_rotary_emb, RotaryEmbedding
 
 from positional_embeddings import SinusoidalEmbeddings, PositionalEmbeddings
 
 
 # from lucidrains
 # https://github.com/lucidrains/tf-bind-transformer/blob/main/tf_bind_transformer/tf_bind_transformer.py#L48
-def fourier_encode(x, dims, theta = 20000):
+def fourier_encode(x, dims, theta=20000):
     device, dtype = x.device, x.dtype
     emb = math.log(theta) / (dims // 2)
-    emb = torch.exp(torch.arange(dims // 2, device = device) * -emb)
+    emb = torch.exp(torch.arange(dims // 2, device=device) * -emb)
     emb = rearrange(x, 'n -> n 1') * rearrange(emb, 'd -> 1 d')
-    emb = torch.cat((emb.sin(), emb.cos()), dim = -1)
+    emb = torch.cat((emb.sin(), emb.cos()), dim=-1)
     return emb
+
 
 # from lucidrains
 # https://github.com/lucidrains/x-transformers/blob/main/x_transformers/x_transformers.py#L186
@@ -25,27 +27,29 @@ def fourier_encode(x, dims, theta = 20000):
 def exists(val):
     return val is not None
 
+
 class AlibiPositionalBias(nn.Module):
     def __init__(self, heads, **kwargs):
         super().__init__()
         self.heads = heads
         slopes = torch.Tensor(self._get_slopes(heads))
         slopes = rearrange(slopes, 'h -> () h () ()')
-        self.register_buffer('slopes', slopes, persistent = False)
-        self.register_buffer('bias', None, persistent = False)
+        self.register_buffer('slopes', slopes, persistent=False)
+        self.register_buffer('bias', None, persistent=False)
 
     @staticmethod
     def _get_slopes(heads):
         def get_slopes_power_of_2(n):
-            start = (2**(-2**-(math.log2(n)-3)))
+            start = (2 ** (-2 ** -(math.log2(n) - 3)))
             ratio = start
-            return [start*ratio**i for i in range(n)]
+            return [start * ratio ** i for i in range(n)]
 
         if math.log2(heads).is_integer():
             return get_slopes_power_of_2(heads)
 
         closest_power_of_2 = 2 ** math.floor(math.log2(heads))
-        return get_slopes_power_of_2(closest_power_of_2) + get_slopes_power_of_2(2 * closest_power_of_2)[0::2][:heads-closest_power_of_2]
+        return get_slopes_power_of_2(closest_power_of_2) + get_slopes_power_of_2(2 * closest_power_of_2)[0::2][
+                                                           :heads - closest_power_of_2]
 
     def forward(self, qk_dots):
         h, i, j, device = *qk_dots.shape[-3:], qk_dots.device
@@ -53,14 +57,14 @@ class AlibiPositionalBias(nn.Module):
         if exists(self.bias) and self.bias.shape[-1] >= j:
             return qk_dots + self.bias[..., :j]
 
-        bias = torch.arange(j, device = device)
+        bias = torch.arange(j, device=device)
         bias = rearrange(bias, 'j -> () () () j')
         bias = bias * self.slopes
 
         num_heads_unalibied = h - bias.shape[1]
         bias = F.pad(bias, (0, 0, 0, 0, 0, num_heads_unalibied))
 
-        self.register_buffer('bias', bias, persistent = False)
+        self.register_buffer('bias', bias, persistent=False)
         return qk_dots + self.bias
 
 
@@ -94,7 +98,8 @@ class PositionwiseFeedforwardLayer(nn.Module):
 
 class MultiHeadAttentionLayer(nn.Module):
     def __init__(self, hid_dim: int, n_heads: int, dropout: float, device: torch.device,
-                 relative_position_embedding: str, sequence_length: int, embedding_network_hidden: int = 256, fourier_dims: int = 16) -> None:
+                 relative_position_embedding: str, sequence_length: int, embedding_network_hidden: int = 256,
+                 fourier_dims: int = 16) -> None:
         super().__init__()
 
         assert hid_dim % n_heads == 0
@@ -117,7 +122,6 @@ class MultiHeadAttentionLayer(nn.Module):
 
         self.fourier_dims = fourier_dims
 
-        # TODO: support Rotary
         if relative_position_embedding in ["log_cpb", "linear_cpb"]:
             self.embedding_network: nn.Module = nn.Sequential(
                 nn.Linear(in_features=1, out_features=embedding_network_hidden, bias=True),
@@ -136,6 +140,11 @@ class MultiHeadAttentionLayer(nn.Module):
             self.alibi_pos_embedding = AlibiPositionalBias(n_heads)
         else:
             self.alibi_pos_embedding = None
+
+        if relative_position_embedding == "rotary":
+            self.rotary_pos_embedding = RotaryEmbedding(dim=(hid_dim // n_heads) // 2).to(device)
+        else:
+            self.rotary_pos_embedding = None
 
         self.sequence_length = sequence_length
 
@@ -167,19 +176,27 @@ class MultiHeadAttentionLayer(nn.Module):
         # K = [batch size, n heads, key len, head dim]
         # V = [batch size, n heads, value len, head dim]
 
+        # if rotary:
+        if self.rotary_pos_embedding:
+            # apply the rotations to your queries and keys after the heads have been split out,
+            # but prior to the dot product and subsequent softmax (attention)
+            Q = apply_rotary_emb(self.freqs, Q)
+            K = apply_rotary_emb(self.freqs, K)
+
         energy = torch.matmul(Q, K.permute(0, 1, 3, 2)) / self.scale
+
+        # energy = [batch size, n heads, query len, key len]
 
         # if embedding network
         if self.embedding_network:
-            # apply relative positional embeddings from SwinV2 (either log or linear)
+            # apply relative positional embeddings from SwinV2 (either log or linear or fourier)
+            # TODO: fix context window length
             energy = energy + self.__get_relative_positional_encodings()[:, :, :seq_len, :seq_len]
 
         # if alibi pos embeddings
         if self.alibi_pos_embedding:
             # apply them to the dot product of Q and K
             energy = self.alibi_pos_embedding(energy)
-
-        # energy = [batch size, n heads, query len, key len]
 
         if mask is not None:
             energy = energy.masked_fill(mask == 0, -1e10)
@@ -247,6 +264,12 @@ class MultiHeadAttentionLayer(nn.Module):
         if self.relative_position_embedding in ["log_cpb", "linear_cpb", "fourier_cpb"]:
             # Make new relative positions
             self.__make_relative_positions()
+
+        if self.relative_position_embedding == "rotary":
+            # cache with a key that is the sequence length, so that it does not need to recompute
+            # TODO: fix context window length
+            self.freqs = self.rotary_pos_embedding(torch.arange(new_sequence_length-1).to(self.scale.device),
+                                                   cache_key=new_sequence_length-1)
 
 
 class EncoderLayer(nn.Module):
