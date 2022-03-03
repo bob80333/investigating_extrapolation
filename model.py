@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange
-from rotary_embedding_torch import apply_rotary_emb, RotaryEmbedding
+from rotary_embedding_torch import RotaryEmbedding
 
 from positional_embeddings import SinusoidalEmbeddings, PositionalEmbeddings
 
@@ -180,8 +180,8 @@ class MultiHeadAttentionLayer(nn.Module):
         if self.rotary_pos_embedding:
             # apply the rotations to your queries and keys after the heads have been split out,
             # but prior to the dot product and subsequent softmax (attention)
-            Q = apply_rotary_emb(self.freqs, Q)
-            K = apply_rotary_emb(self.freqs, K)
+            Q = self.rotary_pos_embedding.rotate_queries_or_keys(self.freqs, Q)
+            K = self.rotary_pos_embedding.rotate_queries_or_keys(self.freqs, K)
 
         energy = torch.matmul(Q, K.permute(0, 1, 3, 2)) / self.scale
 
@@ -265,11 +265,6 @@ class MultiHeadAttentionLayer(nn.Module):
             # Make new relative positions
             self.__make_relative_positions()
 
-        if self.relative_position_embedding == "rotary":
-            # cache with a key that is the sequence length, so that it does not need to recompute
-            # TODO: fix context window length
-            self.freqs = self.rotary_pos_embedding(torch.arange(new_sequence_length-1).to(self.scale.device),
-                                                   cache_key=new_sequence_length-1)
 
 
 class EncoderLayer(nn.Module):
