@@ -128,6 +128,14 @@ class MultiHeadAttentionLayer(nn.Module):
                 nn.ReLU(inplace=True),
                 nn.Linear(in_features=embedding_network_hidden, out_features=n_heads, bias=True))
 
+        elif relative_position_embedding == "linear_cpb_large":
+            self.embedding_network: nn.Module = nn.Sequential(
+                nn.Linear(in_features=1, out_features=embedding_network_hidden, bias=True),
+                nn.ReLU(inplace=True),
+                nn.Linear(in_features=embedding_network_hidden, out_features=embedding_network_hidden, bias=True),
+                nn.ReLU(inplace=True),
+                nn.Linear(in_features=embedding_network_hidden, out_features=n_heads, bias=True))
+
         elif relative_position_embedding == "fourier_cpb":
             self.embedding_network: nn.Module = nn.Sequential(
                 nn.Linear(in_features=fourier_dims, out_features=embedding_network_hidden, bias=True),
@@ -261,7 +269,7 @@ class MultiHeadAttentionLayer(nn.Module):
         # Set new window size
         self.sequence_length = new_sequence_length
 
-        if self.relative_position_embedding in ["log_cpb", "linear_cpb", "fourier_cpb"]:
+        if self.relative_position_embedding in ["log_cpb", "linear_cpb", "fourier_cpb", "linear_cpb_large"]:
             # Make new relative positions
             self.__make_relative_positions()
 
