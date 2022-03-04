@@ -84,6 +84,7 @@ python train.py --model-size xsmall --absolute-position-embedding none --relativ
 
 avg avg ppl for length 2048 across 5 runs
 linear_cpb:     116.56259 +- 0.93250
+linear_cpb_l:   117.06628 +- .78906
 log_cpb:        117.80258 +- 1.20369
 fourier_cpb:    132.80323 +- 2.95787
 alibi:          119.69891 +- 0.79353
@@ -92,6 +93,7 @@ rotary:         280.03073 +- 6.81101
 
 avg avg ppl for length 128 across 5 runs
 linear_cpb:     119.99844 +- 0.73475
+linear_cpb_l:   120.50163 +- 0.68804
 log_cpb:        120.72210 +- 1.13642
 fourier_cpb:    119.18559 +- 0.98430
 alibi:          123.93904 +- 0.66219
@@ -182,3 +184,20 @@ python train.py --model-size xsmall --absolute-position-embedding none --relativ
 python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding rotary --ckpt result_xsmall_none_rotary13.pt > result_xsmall_none_rotary13.txt
 python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding rotary --ckpt result_xsmall_none_rotary14.pt > result_xsmall_none_rotary14.txt
 python train.py --model-size xsmall --absolute-position-embedding none --relative-position-embedding rotary --ckpt result_xsmall_none_rotary15.pt > result_xsmall_none_rotary15.txt
+
+avg avg ppl for length 2048 across 15 runs
+linear_cpb:
+linear_cpb_l:   116.83956 +- 0.88274
+log_cpb:
+fourier_cpb:
+alibi:
+rotary:
+
+
+avg avg ppl for length 128 across 15 runs
+linear_cpb:
+linear_cpb_l:   120.30822 +- 0.79160
+log_cpb:
+fourier_cpb:
+alibi:
+rotary:

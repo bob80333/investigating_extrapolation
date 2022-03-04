@@ -274,7 +274,6 @@ class MultiHeadAttentionLayer(nn.Module):
             self.__make_relative_positions()
 
 
-
 class EncoderLayer(nn.Module):
     def __init__(self,
                  hid_dim: int,
