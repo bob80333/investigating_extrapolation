@@ -61,7 +61,7 @@ if __name__ == "__main__":
     elif args.model_size == "small":  # 16.8M non embedding parameters
         n_layers = 8
         width = 512
-        n_heads = 12
+        n_heads = 8
     elif args.model_size == "medium":  # 56.7M non embedding parameters
         n_layers = 12
         width = 768
