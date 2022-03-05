@@ -194,8 +194,8 @@ linear_cpb:     116.00805 +- 0.86725
 linear_cpb_l:   116.83956 +- 0.88274
 log_cpb:        117.00886 +- 1.23997
 fourier_cpb:    133.25709 +- 2.71880
-alibi:
-rotary:
+alibi:          120.05529 +- 0.93290
+rotary:         279.71282 +- 8.55629
 
 
 avg avg ppl for length 128 across 15 runs
@@ -203,8 +203,8 @@ linear_cpb:     119.57854 +- 0.73356
 linear_cpb_l:   120.30822 +- 0.79160
 log_cpb:        120.05336 +- 1.07849
 fourier_cpb:    119.17091 +- 0.85088
-alibi:
-rotary:
+alibi:          124.17228 +- 0.81266
+rotary:         121.61846 +- 0.91422
 
 Test at larger scales, remove a few options:
 
