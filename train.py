@@ -39,7 +39,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--max-context-length", type=int, default=1024)
     parser.add_argument("--train-context-length", type=int, default=128)
-    parser.add_argument("--test-context-lengths", type=list, default=[128, 256, 512, 1024, 2048])
+    parser.add_argument("--test-context-lengths", type=list, default=[128, 256, 512, 2048])
     parser.add_argument("--position-start-augmentation", type=bool, default=False)
 
     parser.add_argument("--absolute-position-embedding", choices=["sinusoidal", "scaled_sinusoidal", "learned", "none"],
