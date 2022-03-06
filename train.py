@@ -195,12 +195,12 @@ if __name__ == "__main__":
                 with autocast():
                     output = model(batch[:, :-1], mask, positions[:, :-1])
 
-                output_dim = output.shape[-1]
+                    output_dim = output.shape[-1]
 
-                output = output.contiguous().view(-1, output_dim)
-                targets = batch[:, 1:].contiguous().view(-1)
+                    output = output.contiguous().view(-1, output_dim)
+                    targets = batch[:, 1:].contiguous().view(-1)
 
-                loss = cross_entropy(output, targets)
+                    loss = cross_entropy(output, targets)
 
                 loss = loss.view(batch_size, -1)
 
