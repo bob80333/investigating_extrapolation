@@ -231,11 +231,6 @@ python train.py --model-size small --absolute-position-embedding none --relative
 python train.py --model-size small --absolute-position-embedding none --relative-position-embedding linear_cpb --ckpt result_small_none_linear_cpb8.pt > result_small_none_linear_cpb8.txt
 python train.py --model-size small --absolute-position-embedding none --relative-position-embedding linear_cpb --ckpt result_small_none_linear_cpb9.pt > result_small_none_linear_cpb9.txt
 python train.py --model-size small --absolute-position-embedding none --relative-position-embedding linear_cpb --ckpt result_small_none_linear_cpb10.pt > result_small_none_linear_cpb10.txt
-python train.py --model-size small --absolute-position-embedding none --relative-position-embedding linear_cpb --ckpt result_small_none_linear_cpb11.pt > result_small_none_linear_cpb11.txt
-python train.py --model-size small --absolute-position-embedding none --relative-position-embedding linear_cpb --ckpt result_small_none_linear_cpb12.pt > result_small_none_linear_cpb12.txt
-python train.py --model-size small --absolute-position-embedding none --relative-position-embedding linear_cpb --ckpt result_small_none_linear_cpb13.pt > result_small_none_linear_cpb13.txt
-python train.py --model-size small --absolute-position-embedding none --relative-position-embedding linear_cpb --ckpt result_small_none_linear_cpb14.pt > result_small_none_linear_cpb14.txt
-python train.py --model-size small --absolute-position-embedding none --relative-position-embedding linear_cpb --ckpt result_small_none_linear_cpb15.pt > result_small_none_linear_cpb15.txt
 
 python train.py --model-size small --absolute-position-embedding none --relative-position-embedding alibi --ckpt result_small_none_alibi1.pt > result_small_none_alibi1.txt
 python train.py --model-size small --absolute-position-embedding none --relative-position-embedding alibi --ckpt result_small_none_alibi2.pt > result_small_none_alibi2.txt
@@ -247,11 +242,6 @@ python train.py --model-size small --absolute-position-embedding none --relative
 python train.py --model-size small --absolute-position-embedding none --relative-position-embedding alibi --ckpt result_small_none_alibi8.pt > result_small_none_alibi8.txt
 python train.py --model-size small --absolute-position-embedding none --relative-position-embedding alibi --ckpt result_small_none_alibi9.pt > result_small_none_alibi9.txt
 python train.py --model-size small --absolute-position-embedding none --relative-position-embedding alibi --ckpt result_small_none_alibi10.pt > result_small_none_alibi10.txt
-python train.py --model-size small --absolute-position-embedding none --relative-position-embedding alibi --ckpt result_small_none_alibi11.pt > result_small_none_alibi11.txt
-python train.py --model-size small --absolute-position-embedding none --relative-position-embedding alibi --ckpt result_small_none_alibi12.pt > result_small_none_alibi12.txt
-python train.py --model-size small --absolute-position-embedding none --relative-position-embedding alibi --ckpt result_small_none_alibi13.pt > result_small_none_alibi13.txt
-python train.py --model-size small --absolute-position-embedding none --relative-position-embedding alibi --ckpt result_small_none_alibi14.pt > result_small_none_alibi14.txt
-python train.py --model-size small --absolute-position-embedding none --relative-position-embedding alibi --ckpt result_small_none_alibi15.pt > result_small_none_alibi15.txt
 
 python train.py --model-size small --absolute-position-embedding none --relative-position-embedding rotary --ckpt result_small_none_rotary1.pt > result_small_none_rotary1.txt
 python train.py --model-size small --absolute-position-embedding none --relative-position-embedding rotary --ckpt result_small_none_rotary2.pt > result_small_none_rotary2.txt
@@ -263,11 +253,6 @@ python train.py --model-size small --absolute-position-embedding none --relative
 python train.py --model-size small --absolute-position-embedding none --relative-position-embedding rotary --ckpt result_small_none_rotary8.pt > result_small_none_rotary8.txt
 python train.py --model-size small --absolute-position-embedding none --relative-position-embedding rotary --ckpt result_small_none_rotary9.pt > result_small_none_rotary9.txt
 python train.py --model-size small --absolute-position-embedding none --relative-position-embedding rotary --ckpt result_small_none_rotary10.pt > result_small_none_rotary10.txt
-python train.py --model-size small --absolute-position-embedding none --relative-position-embedding rotary --ckpt result_small_none_rotary11.pt > result_small_none_rotary11.txt
-python train.py --model-size small --absolute-position-embedding none --relative-position-embedding rotary --ckpt result_small_none_rotary12.pt > result_small_none_rotary12.txt
-python train.py --model-size small --absolute-position-embedding none --relative-position-embedding rotary --ckpt result_small_none_rotary13.pt > result_small_none_rotary13.txt
-python train.py --model-size small --absolute-position-embedding none --relative-position-embedding rotary --ckpt result_small_none_rotary14.pt > result_small_none_rotary14.txt
-python train.py --model-size small --absolute-position-embedding none --relative-position-embedding rotary --ckpt result_small_none_rotary15.pt > result_small_none_rotary15.txt
 
 For small model (up from xsmall) results:
 
