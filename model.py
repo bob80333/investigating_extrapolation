@@ -292,25 +292,25 @@ class EncoderLayer(nn.Module):
         self.positionwise_feedforward = PositionwiseFeedforwardLayer(hid_dim,
                                                                      pf_dim,
                                                                      dropout)
-        self.dropout = nn.Dropout(dropout)
 
     def forward(self, src: torch.FloatTensor, src_mask: torch.FloatTensor) -> torch.FloatTensor:
         # src = [batch size, src len, hid dim]
         # src_mask = [batch size, 1, 1, src len]
 
-        # self attention
-        _src, _ = self.self_attention(src, src, src, src_mask)
+        # pre LN
+        pre = self.self_attn_layer_norm(src)
 
-        # dropout, residual connection and layer norm
-        src = self.self_attn_layer_norm(src + self.dropout(_src))
+        # self attention and residual
+        src = src + self.self_attention(pre, pre, pre, src_mask)[0]
+
 
         # src = [batch size, src len, hid dim]
 
-        # positionwise feedforward
-        _src = self.positionwise_feedforward(src)
+        # pre LN
+        pre = self.ff_layer_norm(src)
 
-        # dropout, residual and layer norm
-        src = self.ff_layer_norm(src + self.dropout(_src))
+        # positionwise feedforward and residual
+        src = src + self.positionwise_feedforward(pre)
 
         # src = [batch size, src len, hid dim]
 
