@@ -21,7 +21,7 @@ def infinite_dataloader(dataloader: DataLoader) -> torch.LongTensor:
             yield batch
 
 
-def build_casual_mask(context_length: int, batch_size: int) -> torch.BoolTensor:
+def build_casual_mask(context_length: int) -> torch.BoolTensor:
     mask = torch.tril(torch.ones(context_length, context_length))
     # mask.shape = [train_context_length, train_context_length]
     mask = mask.unsqueeze(0).unsqueeze(0)
@@ -128,7 +128,7 @@ if __name__ == "__main__":
         positions = torch.arange(0, args.train_context_length).unsqueeze(0).repeat(args.batch_size, 1).cuda() + start
         # positions.shape = [batch_size, train_context_length]
 
-        mask = build_casual_mask(args.train_context_length - 1, args.batch_size).cuda()
+        mask = build_casual_mask(args.train_context_length - 1).cuda()
         # mask.shape = [batch_size, 1, train_context_length, train_context_length]
         with autocast():
             output = model(batch[:, :-1], mask, positions[:, :-1])
@@ -189,7 +189,7 @@ if __name__ == "__main__":
                 positions = torch.arange(0, test_length).unsqueeze(0).repeat(batch_size, 1).cuda()
                 # positions.shape = [batch_size, test_length]
 
-                mask = build_casual_mask(test_length - 1, batch_size).cuda()
+                mask = build_casual_mask(test_length - 1).cuda()
                 # mask.shape = [batch_size, 1, test_length-1, test_length-1]
 
                 with autocast():
