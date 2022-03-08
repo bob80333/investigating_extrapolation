@@ -108,8 +108,6 @@ if __name__ == "__main__":
     print("Initialized transformer model with", total_params, "total parameters")
     print("Total non-embedding parameters:", non_embedding_params)
 
-    exit(0)
-
     optimizer = optim.Adam(model.parameters(), lr=2e-4)
 
     train_dataset = TextDataset(list(Path("ao3_small_dataset/train").rglob("*.tok")), "byte_tokenized_8k.json",
