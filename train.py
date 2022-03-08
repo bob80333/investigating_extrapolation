@@ -57,25 +57,25 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.model_size == "xsmall":  # 7.1M non embedding parameters
+        n_layers = 4
+        width = 256
+        n_heads = 4
+    elif args.model_size == "small":  # 16.8M non embedding parameters
         n_layers = 6
         width = 384
         n_heads = 6
-    elif args.model_size == "small":  # 16.8M non embedding parameters
+    elif args.model_size == "medium":  # 56.7M non embedding parameters
         n_layers = 8
         width = 512
         n_heads = 8
-    elif args.model_size == "medium":  # 56.7M non embedding parameters
+    elif args.model_size == "large":  # 134.3M non embedding parameters
         n_layers = 12
         width = 768
         n_heads = 12
-    elif args.model_size == "large":  # 134.3M non embedding parameters
+    elif args.model_size == "xlarge":  # 262.4M non embedding parameters
         n_layers = 16
         width = 1024
         n_heads = 16
-    elif args.model_size == "xlarge":  # 262.4M non embedding parameters
-        n_layers = 20
-        width = 1280
-        n_heads = 20
     else:
         raise Exception("invalid model choice")
 
@@ -83,11 +83,11 @@ if __name__ == "__main__":
     # and the absolute embeddings are the kind that can be length adjusted after training (none/sinusoidal)
     # then set model max context length to training length
     if args.relative_position_embedding != "none" and args.absolute_position_embedding in ["none", "sinusoidal", "scaled_sinusoidal"]:
-        model = Encoder(8192, width, n_layers, n_heads, width * 2, 0.1, torch.device("cuda"), args.train_context_length,
+        model = Encoder(8192, width, n_layers, n_heads, width * 4, 0.1, torch.device("cuda"), args.train_context_length,
                         args.absolute_position_embedding, args.relative_position_embedding).cuda()
     # otherwise set max context length to max context length if no relative pos embeddings
     elif args.relative_position_embedding == "none":
-        model = Encoder(8192, width, n_layers, n_heads, width * 2, 0.1, torch.device("cuda"), args.max_context_length,
+        model = Encoder(8192, width, n_layers, n_heads, width * 4, 0.1, torch.device("cuda"), args.max_context_length,
                         args.absolute_position_embedding, args.relative_position_embedding).cuda()
     # learned pos embeddings + relative pos embeddings don't mix
     else:
