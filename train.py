@@ -168,8 +168,6 @@ if __name__ == "__main__":
 
     cross_entropy = torch.nn.CrossEntropyLoss(reduction='none')
 
-    all_losses = []
-
     avg_losses = []
     median_losses = []
 
@@ -220,7 +218,6 @@ if __name__ == "__main__":
 
             avg_losses.append(avg_loss)
             median_losses.append(median_loss)
-            all_losses.append(losses)
 
     print()
     for test_length, avg_loss in zip(args.test_ctx_lens, avg_losses):
@@ -232,7 +229,6 @@ if __name__ == "__main__":
         print(
             f"Test Length: {test_length}\t\tMedian Test Loss: \t{median_loss:.5f}\t\t Median Test Perplexity: \t{math.exp(median_loss):.5f}")
 
-    with open(args.ckpt.replace(".pt", "_all_losses.npy"), 'wb') as writer:
-        pickle.dump(losses, writer)
+    np.savez_compressed(args.ckpt.replace(".pt", "_2048_losses"), losses)
 
     torch.save(model.state_dict(), args.ckpt)
