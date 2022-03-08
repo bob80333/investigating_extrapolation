@@ -48,6 +48,7 @@ class TextDataset(Dataset):
 
             else:
                 ids = np.load(file)
+                ids = ids.f.arr_0
             # store tokens
             self.encoded_tokens.append(ids)
             total_tokens += len(ids)
