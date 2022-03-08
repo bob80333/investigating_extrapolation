@@ -58,6 +58,8 @@ class MultiHeadAttentionLayer(nn.Module):
                  fourier_dims: int = 16) -> None:
         super().__init__()
 
+        self.should_use_cache = False
+        self.cpb_cache = None
         assert hid_dim % n_heads == 0
 
         self.hid_dim = hid_dim
@@ -211,6 +213,9 @@ class MultiHeadAttentionLayer(nn.Module):
         Method computes the relative positional encodings
         :return: (torch.Tensor) Relative positional encodings [1, number of heads, window size ** 2, window size ** 2]
         """
+        # skip computation and use cached values if activated
+        if self.should_use_cache:
+            return self.cpb_cache
         relative_position_bias = self.embedding_network(self.relative_indices)
         relative_position_bias = relative_position_bias.permute(1, 0)
         relative_position_bias = relative_position_bias.reshape(self.n_heads, self.sequence_length,
@@ -228,6 +233,31 @@ class MultiHeadAttentionLayer(nn.Module):
         if self.relative_position_embedding in ["log_cpb", "linear_cpb", "fourier_cpb", "linear_cpb_large"]:
             # Make new relative positions
             self.__make_relative_positions()
+
+            # if the cache is in use, update it with the new seqlen
+            if self.should_use_cache:
+                self.use_cache(self.should_use_cache)
+
+    def use_cache(self, should_use: bool = False):
+        if should_use:
+            self.cpb_cache = self.__get_relative_positional_encodings()
+
+        self.should_use_cache = should_use
+
+    def train(self, mode: bool = True):
+        if not isinstance(mode, bool):
+            raise ValueError("training mode is expected to be boolean")
+
+        # modify cache behavior whether in training or evaluation mode
+        # cache is opposite of mode here
+        # when mode == True, that is training mode, and so cache should be False/disabled
+        # when mode == False, that is eval mode, and so cache should be True/enabled
+        self.use_cache(not mode)
+
+        self.training = mode
+        for module in self.children():
+            module.train(mode)
+        return self
 
 
 class EncoderLayer(nn.Module):
