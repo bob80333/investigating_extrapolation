@@ -255,4 +255,35 @@ python train.py --model-size xsmall --rel-pos-embed rotary --ckpt result_xsmall_
 python train.py --model-size xsmall --rel-pos-embed rotary --ckpt result_xsmall_rotary4.pt --seed 1024 > result_xsmall_rotary4.txt
 python train.py --model-size xsmall --rel-pos-embed rotary --ckpt result_xsmall_rotary5.pt --seed 365 > result_xsmall_rotary5.txt
 
+And up a scale
+
+python train.py --model-size small --rel-pos-embed linear_cpb --ckpt result_small_linear_cpb1.pt --seed 42 > result_small_linear_cpb1.txt
+python train.py --model-size small --rel-pos-embed linear_cpb --ckpt result_small_linear_cpb2.pt --seed 1337 > result_small_linear_cpb2.txt
+python train.py --model-size small --rel-pos-embed linear_cpb --ckpt result_small_linear_cpb3.pt --seed 3407 > result_small_linear_cpb3.txt
+python train.py --model-size small --rel-pos-embed linear_cpb --ckpt result_small_linear_cpb4.pt --seed 1024 > result_small_linear_cpb4.txt
+python train.py --model-size small --rel-pos-embed linear_cpb --ckpt result_small_linear_cpb5.pt --seed 365 > result_small_linear_cpb5.txt
+
+python train.py --model-size small --rel-pos-embed log_cpb --ckpt result_small_log_cpb1.pt --seed 42 > result_small_log_cpb1.txt
+python train.py --model-size small --rel-pos-embed log_cpb --ckpt result_small_log_cpb2.pt --seed 1337 > result_small_log_cpb2.txt
+python train.py --model-size small --rel-pos-embed log_cpb --ckpt result_small_log_cpb3.pt --seed 3407 > result_small_log_cpb3.txt
+python train.py --model-size small --rel-pos-embed log_cpb --ckpt result_small_log_cpb4.pt --seed 1024 > result_small_log_cpb4.txt
+python train.py --model-size small --rel-pos-embed log_cpb --ckpt result_small_log_cpb5.pt --seed 365 > result_small_log_cpb5.txt
+
+python train.py --model-size small --rel-pos-embed fourier_cpb --ckpt result_small_fourier_cpb1.pt --seed 42 > result_small_fourier_cpb1.txt
+python train.py --model-size small --rel-pos-embed fourier_cpb --ckpt result_small_fourier_cpb2.pt --seed 1337 > result_small_fourier_cpb2.txt
+python train.py --model-size small --rel-pos-embed fourier_cpb --ckpt result_small_fourier_cpb3.pt --seed 3407 > result_small_fourier_cpb3.txt
+python train.py --model-size small --rel-pos-embed fourier_cpb --ckpt result_small_fourier_cpb4.pt --seed 1024 > result_small_fourier_cpb4.txt
+python train.py --model-size small --rel-pos-embed fourier_cpb --ckpt result_small_fourier_cpb5.pt --seed 365 > result_small_fourier_cpb5.txt
+
+python train.py --model-size small --rel-pos-embed alibi --ckpt result_small_alibi1.pt --seed 42 > result_small_alibi1.txt
+python train.py --model-size small --rel-pos-embed alibi --ckpt result_small_alibi2.pt --seed 1337 > result_small_alibi2.txt
+python train.py --model-size small --rel-pos-embed alibi --ckpt result_small_alibi3.pt --seed 3407 > result_small_alibi3.txt
+python train.py --model-size small --rel-pos-embed alibi --ckpt result_small_alibi4.pt --seed 1024 > result_small_alibi4.txt
+python train.py --model-size small --rel-pos-embed alibi --ckpt result_small_alibi5.pt --`seed 365 > result_small_alibi5.txt
+
+python train.py --model-size small --rel-pos-embed rotary --ckpt result_small_rotary1.pt --seed 42 > result_small_rotary1.txt
+python train.py --model-size small --rel-pos-embed rotary --ckpt result_small_rotary2.pt --seed 1337 > result_small_rotary2.txt
+python train.py --model-size small --rel-pos-embed rotary --ckpt result_small_rotary3.pt --seed 3407 > result_small_rotary3.txt
+python train.py --model-size small --rel-pos-embed rotary --ckpt result_small_rotary4.pt --seed 1024 > result_small_rotary4.txt
+python train.py --model-size small --rel-pos-embed rotary --ckpt result_small_rotary5.pt --seed 365 > result_small_rotary5.txt
 
