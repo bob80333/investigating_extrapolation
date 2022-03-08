@@ -23,9 +23,9 @@ def infinite_dataloader(dataloader: DataLoader) -> torch.LongTensor:
 
 def build_casual_mask(context_length: int) -> torch.BoolTensor:
     mask = torch.tril(torch.ones(context_length, context_length))
-    # mask.shape = [train_context_length, train_context_length]
+    # mask.shape = [train_ctx_len, train_ctx_len]
     mask = mask.unsqueeze(0).unsqueeze(0)
-    # mask.shape = [batch_size, 1, train_context_length, train_context_length]
+    # mask.shape = [batch_size, 1, train_ctx_len, train_ctx_len]
     return mask.bool()
 
 
@@ -39,14 +39,15 @@ if __name__ == "__main__":
                         choices=["xsmall", "small", "medium", "large", "xlarge"], type=str,
                         default="xsmall", help="model sizes")
 
-    parser.add_argument("--max-context-length", type=int, default=1024)
-    parser.add_argument("--train-context-length", type=int, default=128)
-    parser.add_argument("--test-context-lengths", type=list, default=[128, 2048])
+    parser.add_argument("--max-ctx-len", type=int, default=1024)
+    parser.add_argument("--train-ctx-len", type=int, default=128)
+    parser.add_argument("--test-ctt-lens", type=list, default=[128, 2048])
     parser.add_argument("--position-start-augmentation", type=bool, default=False)
 
     parser.add_argument("--abs-pos-embed", choices=["sinusoidal", "scaled_sinusoidal", "learned", "none"],
                         type=str, default="none")
-    parser.add_argument("--rel-pos-embed", choices=["linear_cpb", "log_cpb", "fourier_cpb", "alibi", "rotary", "none", "linear_cpb_large"])
+    parser.add_argument("--rel-pos-embed",
+                        choices=["linear_cpb", "log_cpb", "fourier_cpb", "alibi", "rotary", "none", "linear_cpb_large"])
 
     parser.add_argument("--num-train-steps", type=int, default=10_000)
     parser.add_argument("--batch-size", type=int, default=128)
@@ -81,22 +82,20 @@ if __name__ == "__main__":
     else:
         raise Exception("invalid model choice")
 
-
     # apply random seeds
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
 
-
     # if using relative pos embeddings
     # and the absolute embeddings are the kind that can be length adjusted after training (none/sinusoidal)
     # then set model max context length to training length
-    if args.relative_position_embedding != "none" and args.absolute_position_embedding in ["none", "sinusoidal", "scaled_sinusoidal"]:
-        model = Encoder(8192, width, n_layers, n_heads, width * 4, 0.1, torch.device("cuda"), args.train_context_length,
-                        args.absolute_position_embedding, args.relative_position_embedding).cuda()
+    if args.rel_pos_embed != "none" and args.abs_pos_embed in ["none", "sinusoidal", "scaled_sinusoidal"]:
+        model = Encoder(8192, width, n_layers, n_heads, width * 4, 0.1, torch.device("cuda"), args.train_ctx_len,
+                        args.abs_pos_embed, args.rel_pos_embed).cuda()
     # otherwise set max context length to max context length if no relative pos embeddings
-    elif args.relative_position_embedding == "none":
-        model = Encoder(8192, width, n_layers, n_heads, width * 4, 0.1, torch.device("cuda"), args.max_context_length,
-                        args.absolute_position_embedding, args.relative_position_embedding).cuda()
+    elif args.rel_pos_embed == "none":
+        model = Encoder(8192, width, n_layers, n_heads, width * 4, 0.1, torch.device("cuda"), args.max_ctx_len,
+                        args.abs_pos_embed, args.rel_pos_embed).cuda()
     # learned pos embeddings + relative pos embeddings don't mix
     else:
         raise ValueError("Cannot have both learned absolute embeddings and relative embeddings (for now)")
@@ -114,7 +113,7 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=2e-4)
 
     train_dataset = TextDataset(list(Path("ao3_small_dataset/train").rglob("*.tok")), "byte_tokenized_8k.json",
-                                args.train_context_length, args.train_context_length, pretokenized=True)
+                                args.train_ctx_len, args.train_ctx_len, pretokenized=True)
 
     # less than 1 epoch is trained, so to ensure all models see the same data in the same order, shuffling is turned off
     train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=False, num_workers=2,
@@ -131,17 +130,17 @@ if __name__ == "__main__":
         batch = next(train_inf_loader).cuda()
 
         if args.position_start_augmentation:
-            start = torch.randint(0, args.max_context_length - args.train_context_length, (args.batch_size,))
+            start = torch.randint(0, args.max_ctx_len - args.train_ctx_len, (args.batch_size,))
         else:
             start = torch.zeros(args.batch_size)
 
         start = start.unsqueeze(1).cuda()
 
-        positions = torch.arange(0, args.train_context_length).unsqueeze(0).repeat(args.batch_size, 1).cuda() + start
-        # positions.shape = [batch_size, train_context_length]
+        positions = torch.arange(0, args.train_ctx_len).unsqueeze(0).repeat(args.batch_size, 1).cuda() + start
+        # positions.shape = [batch_size, train_ctx_len]
 
-        mask = build_casual_mask(args.train_context_length - 1).cuda()
-        # mask.shape = [batch_size, 1, train_context_length, train_context_length]
+        mask = build_casual_mask(args.train_ctx_len - 1).cuda()
+        # mask.shape = [batch_size, 1, train_ctx_len, train_ctx_len]
         with autocast():
             output = model(batch[:, :-1], mask, positions[:, :-1])
 
@@ -167,7 +166,7 @@ if __name__ == "__main__":
 
     valid_datasets = [
         TextDataset(list(Path("ao3_small_dataset/valid").rglob("*.tok")), "byte_tokenized_8k.json", test_length,
-                    stride=test_length, pretokenized=True) for test_length in args.test_context_lengths]
+                    stride=test_length, pretokenized=True) for test_length in args.test_ctx_lens]
 
     cross_entropy = torch.nn.CrossEntropyLoss(reduction='none')
 
@@ -181,16 +180,15 @@ if __name__ == "__main__":
     # get rid of adam??
     optimizer = None
     with torch.inference_mode():
-        for valid_dataset, test_length in zip(valid_datasets, args.test_context_lengths):
-            losses = np.array(np.zeros((valid_dataset.length, test_length-1)))
+        for valid_dataset, test_length in zip(valid_datasets, args.test_ctx_lens):
+            losses = np.array(np.zeros((valid_dataset.length, test_length - 1)))
 
             current_idx = 0
 
             valid_dataloader = DataLoader(valid_dataset, batch_size=max_length_and_batch // test_length, shuffle=False,
                                           num_workers=2)
 
-            if args.relative_position_embedding != "none" and args.absolute_position_embedding in ["none", "sinusoidal",
-                                                                                                   "scaled_sinusoidal"]:
+            if args.rel_pos_embed != "none" and args.abs_pos_embed in ["none", "sinusoidal", "scaled_sinusoidal"]:
                 model.update_sizes(test_length)
 
             for batch in tqdm(valid_dataloader):
@@ -216,7 +214,7 @@ if __name__ == "__main__":
 
                 loss = loss.view(batch_size, -1)
 
-                losses[current_idx:current_idx+batch_size, :] = loss.cpu().numpy()
+                losses[current_idx:current_idx + batch_size, :] = loss.cpu().numpy()
                 current_idx += batch_size
 
             avg_loss = np.mean(losses)
@@ -227,12 +225,14 @@ if __name__ == "__main__":
             all_losses.append(losses)
 
     print()
-    for test_length, avg_loss in zip(args.test_context_lengths, avg_losses):
-        print(f"Test Length: {test_length}\t\tAvg Test Loss: \t\t{avg_loss:.5f}\t\t Avg Test Perplexity: \t\t{math.exp(avg_loss):.5f}")
+    for test_length, avg_loss in zip(args.test_ctx_lens, avg_losses):
+        print(
+            f"Test Length: {test_length}\t\tAvg Test Loss: \t\t{avg_loss:.5f}\t\t Avg Test Perplexity: \t\t{math.exp(avg_loss):.5f}")
 
     print()
-    for test_length, median_loss in zip(args.test_context_lengths, median_losses):
-        print(f"Test Length: {test_length}\t\tMedian Test Loss: \t{median_loss:.5f}\t\t Median Test Perplexity: \t{math.exp(median_loss):.5f}")
+    for test_length, median_loss in zip(args.test_ctx_lens, median_losses):
+        print(
+            f"Test Length: {test_length}\t\tMedian Test Loss: \t{median_loss:.5f}\t\t Median Test Perplexity: \t{math.exp(median_loss):.5f}")
 
     with open(args.ckpt.replace(".pt", "_all_losses.npy"), 'wb') as writer:
         pickle.dump(losses, writer)
