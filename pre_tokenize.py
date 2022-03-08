@@ -1,5 +1,4 @@
 import argparse
-import pickle
 import time
 from pathlib import Path
 
@@ -55,7 +54,6 @@ if __name__ == '__main__':
         for file, tokens in tqdm(zip(chunk, tokenized)):
             file = str(file.absolute()).replace(args.input_data_extension, args.output_data_extension)
 
-            with open(file, 'wb') as writer:
-                pickle.dump(tokens, writer)
+            np.savez_compressed(file, tokens)
 
     print("Complete")

@@ -1,4 +1,3 @@
-import pickle
 from pathlib import Path
 from typing import List
 
@@ -48,8 +47,7 @@ class TextDataset(Dataset):
                 ids = self.tokenizer.encode(text).ids
 
             else:
-                with open(file, 'rb') as reader:
-                    ids = np.array(pickle.load(reader))
+                ids = np.load(file)
             # store tokens
             self.encoded_tokens.append(ids)
             total_tokens += len(ids)
