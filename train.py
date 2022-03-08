@@ -1,6 +1,5 @@
 import argparse
 import math
-import pickle
 from pathlib import Path
 
 import numpy as np
@@ -110,7 +109,7 @@ if __name__ == "__main__":
 
     optimizer = optim.Adam(model.parameters(), lr=2e-4)
 
-    train_dataset = TextDataset(list(Path("ao3_small_dataset/train").rglob("*.tok")), "byte_tokenized_8k.json",
+    train_dataset = TextDataset(list(Path("ao3_small_dataset/train").rglob("*.tok.npz")), "byte_tokenized_8k.json",
                                 args.train_ctx_len, args.train_ctx_len, pretokenized=True)
 
     # less than 1 epoch is trained, so to ensure all models see the same data in the same order, shuffling is turned off
@@ -163,7 +162,7 @@ if __name__ == "__main__":
             print(f"Step: {step + 1}\t Loss: {loss.item():.3f}")
 
     valid_datasets = [
-        TextDataset(list(Path("ao3_small_dataset/valid").rglob("*.tok")), "byte_tokenized_8k.json", test_length,
+        TextDataset(list(Path("ao3_small_dataset/valid").rglob("*.tok.npz")), "byte_tokenized_8k.json", test_length,
                     stride=test_length, pretokenized=True) for test_length in args.test_ctx_lens]
 
     cross_entropy = torch.nn.CrossEntropyLoss(reduction='none')
