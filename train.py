@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--max-ctx-len", type=int, default=1024)
     parser.add_argument("--train-ctx-len", type=int, default=128)
-    parser.add_argument("--test-ctt-lens", type=list, default=[128, 2048])
+    parser.add_argument("--test-ctx-lens", type=list, default=[128, 2048])
     parser.add_argument("--position-start-augmentation", type=bool, default=False)
 
     parser.add_argument("--abs-pos-embed", choices=["sinusoidal", "scaled_sinusoidal", "learned", "none"],
