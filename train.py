@@ -44,9 +44,9 @@ if __name__ == "__main__":
     parser.add_argument("--test-context-lengths", type=list, default=[128, 2048])
     parser.add_argument("--position-start-augmentation", type=bool, default=False)
 
-    parser.add_argument("--absolute-position-embedding", choices=["sinusoidal", "scaled_sinusoidal", "learned", "none"],
+    parser.add_argument("--abs-pos-embed", choices=["sinusoidal", "scaled_sinusoidal", "learned", "none"],
                         type=str, default="none")
-    parser.add_argument("--relative-position-embedding", choices=["linear_cpb", "log_cpb", "fourier_cpb", "alibi", "rotary", "none", "linear_cpb_large"])
+    parser.add_argument("--rel-pos-embed", choices=["linear_cpb", "log_cpb", "fourier_cpb", "alibi", "rotary", "none", "linear_cpb_large"])
 
     parser.add_argument("--num-train-steps", type=int, default=10_000)
     parser.add_argument("--batch-size", type=int, default=128)
