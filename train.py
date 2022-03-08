@@ -56,23 +56,23 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    if args.model_size == "xsmall":  # 7.1M non embedding parameters
+    if args.model_size == "xsmall":  # 3.2M non embedding parameters
         n_layers = 4
         width = 256
         n_heads = 4
-    elif args.model_size == "small":  # 16.8M non embedding parameters
+    elif args.model_size == "small":  # 10.6M non embedding parameters
         n_layers = 6
         width = 384
         n_heads = 6
-    elif args.model_size == "medium":  # 56.7M non embedding parameters
+    elif args.model_size == "medium":  # 25.2M non embedding parameters
         n_layers = 8
         width = 512
         n_heads = 8
-    elif args.model_size == "large":  # 134.3M non embedding parameters
+    elif args.model_size == "large":  # 85.1M non embedding parameters
         n_layers = 12
         width = 768
         n_heads = 12
-    elif args.model_size == "xlarge":  # 262.4M non embedding parameters
+    elif args.model_size == "xlarge":  # 201.5M non embedding parameters
         n_layers = 16
         width = 1024
         n_heads = 16
@@ -101,7 +101,9 @@ if __name__ == "__main__":
     print("Initialized transformer model with", total_params, "total parameters")
     print("Total non-embedding parameters:", non_embedding_params)
 
-    optimizer = optim.Adam(model.parameters(), lr=2e-4, eps=1e-8)
+    exit(0)
+
+    optimizer = optim.Adam(model.parameters(), lr=2e-4)
 
     train_dataset = TextDataset(list(Path("ao3_small_dataset/train").rglob("*.tok")), "byte_tokenized_8k.json",
                                 args.train_context_length, args.train_context_length, pretokenized=True)
