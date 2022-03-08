@@ -54,6 +54,8 @@ if __name__ == "__main__":
 
     parser.add_argument("--ckpt", type=str, default="ckpt.pt")
 
+    parser.add_argument("--seed", type=int, default=42)
+
     args = parser.parse_args()
 
     if args.model_size == "xsmall":  # 3.2M non embedding parameters
@@ -78,6 +80,12 @@ if __name__ == "__main__":
         n_heads = 16
     else:
         raise Exception("invalid model choice")
+
+
+    # apply random seeds
+    torch.manual_seed(args.seed)
+    np.random.seed(args.seed)
+
 
     # if using relative pos embeddings
     # and the absolute embeddings are the kind that can be length adjusted after training (none/sinusoidal)
