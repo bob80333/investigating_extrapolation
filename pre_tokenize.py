@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--input-data-directory", type=str, default="ao3_small_dataset/")
+    parser.add_argument("--input-data-directory", type=str, default="ao3_medium_dataset/")
     parser.add_argument("--input-data-extension", type=str, default=".md")
     parser.add_argument("--output-data-extension", type=str, default=".tok")
 

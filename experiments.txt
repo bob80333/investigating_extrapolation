@@ -301,3 +301,25 @@ python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-po
 python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed alibi --ckpt result_xsmall_alibi1.pt --seed 42 > result_xsmall_alibi1.txt
 
 python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed rotary --ckpt result_xsmall_rotary1.pt --seed 42 > result_xsmall_rotary1.txt
+
+Result is that longer context got lower loss in same steps and tokens per batch
+
+However, it used significantly more computing power and memory, barely fit into the GPU (~3x memory) and took ~6x longer
+
+Since I saw no improvement with increased context length from models trained on 128, it seems like a good idea
+to train some models across various context lengths (128, 256, 512)
+Given anthropic's new paper on "Induction Heads" it seems worth it to try and train some models to achieve that
+According to their data, it takes ~2.5 to 5 BILLION tokens seen to activate the meta-learning
+These models will all be trained for ~6.5 BILLION tokens to ensure that the meta-learning is hit during training
+
+Training some xsmall linear_cpb models:
+
+python train.py --model-size xsmall --train-ctx-len 128 -batch-size 256 --num-train-steps 200000 --rel-pos-embed linear_cpb --ckpt xsmall_linear_cpb_128_1.pt --seed 42 > xsmall_linear_cpb_128_1.txt
+python train.py --model-size xsmall --train-ctx-len 256 -batch-size 128 --num-train-steps 200000 --rel-pos-embed linear_cpb --ckpt xsmall_linear_cpb_256_1.pt --seed 42 > xsmall_linear_cpb_256_1.txt
+python train.py --model-size xsmall --train-ctx-len 512 -batch-size 64 --num-train-steps 200000 --rel-pos-embed linear_cpb --ckpt xsmall_linear_cpb_512_1.pt --seed 42 > xsmall_linear_cpb_512_1.txt
+
+Training some xsmall alibi models:
+
+python train.py --model-size xsmall --train-ctx-len 128 -batch-size 256 --num-train-steps 200000 --rel-pos-embed alibi --ckpt xsmall_alibi_128_1.pt --seed 42 > xsmall_alibi_128_1.txt
+python train.py --model-size xsmall --train-ctx-len 256 -batch-size 128 --num-train-steps 200000 --rel-pos-embed alibi --ckpt xsmall_alibi_256_1.pt --seed 42 > xsmall_alibi_256_1.txt
+python train.py --model-size xsmall --train-ctx-len 512 -batch-size 64 --num-train-steps 200000 --rel-pos-embed alibi --ckpt xsmall_alibi_512_1.pt --seed 42 > xsmall_alibi_512_1.txt
