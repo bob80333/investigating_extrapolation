@@ -293,31 +293,11 @@ Context length of 2048.
 To maintain same # tokens per batch, reduce batch size down to 8, same # of tokens as 128 ctx with 128 batch
 
 python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed linear_cpb --ckpt result_xsmall_linear_cpb1.pt --seed 42 > result_xsmall_linear_cpb1.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed linear_cpb --ckpt result_xsmall_linear_cpb2.pt --seed 1337 > result_xsmall_linear_cpb2.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed linear_cpb --ckpt result_xsmall_linear_cpb3.pt --seed 3407 > result_xsmall_linear_cpb3.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed linear_cpb --ckpt result_xsmall_linear_cpb4.pt --seed 1024 > result_xsmall_linear_cpb4.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed linear_cpb --ckpt result_xsmall_linear_cpb5.pt --seed 365 > result_xsmall_linear_cpb5.txt
 
 python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed log_cpb --ckpt result_xsmall_log_cpb1.pt --seed 42 > result_xsmall_log_cpb1.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed log_cpb --ckpt result_xsmall_log_cpb2.pt --seed 1337 > result_xsmall_log_cpb2.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed log_cpb --ckpt result_xsmall_log_cpb3.pt --seed 3407 > result_xsmall_log_cpb3.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed log_cpb --ckpt result_xsmall_log_cpb4.pt --seed 1024 > result_xsmall_log_cpb4.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed log_cpb --ckpt result_xsmall_log_cpb5.pt --seed 365 > result_xsmall_log_cpb5.txt
 
 python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed fourier_cpb --ckpt result_xsmall_fourier_cpb1.pt --seed 42 > result_xsmall_fourier_cpb1.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed fourier_cpb --ckpt result_xsmall_fourier_cpb2.pt --seed 1337 > result_xsmall_fourier_cpb2.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed fourier_cpb --ckpt result_xsmall_fourier_cpb3.pt --seed 3407 > result_xsmall_fourier_cpb3.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed fourier_cpb --ckpt result_xsmall_fourier_cpb4.pt --seed 1024 > result_xsmall_fourier_cpb4.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed fourier_cpb --ckpt result_xsmall_fourier_cpb5.pt --seed 365 > result_xsmall_fourier_cpb5.txt
 
 python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed alibi --ckpt result_xsmall_alibi1.pt --seed 42 > result_xsmall_alibi1.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed alibi --ckpt result_xsmall_alibi2.pt --seed 1337 > result_xsmall_alibi2.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed alibi --ckpt result_xsmall_alibi3.pt --seed 3407 > result_xsmall_alibi3.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed alibi --ckpt result_xsmall_alibi4.pt --seed 1024 > result_xsmall_alibi4.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed alibi --ckpt result_xsmall_alibi5.pt --seed 365 > result_xsmall_alibi5.txt
 
 python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed rotary --ckpt result_xsmall_rotary1.pt --seed 42 > result_xsmall_rotary1.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed rotary --ckpt result_xsmall_rotary2.pt --seed 1337 > result_xsmall_rotary2.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed rotary --ckpt result_xsmall_rotary3.pt --seed 3407 > result_xsmall_rotary3.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed rotary --ckpt result_xsmall_rotary4.pt --seed 1024 > result_xsmall_rotary4.txt
-python train.py --model-size xsmall --train-ctx-len 2048 --batch-size 8 --rel-pos-embed rotary --ckpt result_xsmall_rotary5.pt --seed 365 > result_xsmall_rotary5.txt
