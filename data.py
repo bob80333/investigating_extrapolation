@@ -27,7 +27,7 @@ class TextDataset(Dataset):
             raise ValueError("Stride must be >= 1, otherwise the same piece of data will be repeated infinite times")
 
         self.encoded_tokens = []
-        self.n_tokens_windows = []
+        self.n_tokens_windows = np.zeros(len(text_files), dtype=np.uint32)
 
         self.length = 0
         self.sequence_length = sequence_length
@@ -35,7 +35,7 @@ class TextDataset(Dataset):
 
         total_tokens = 0
 
-        for file in tqdm(text_files):
+        for i, file in enumerate(tqdm(text_files)):
             if not pretokenized:
                 with open(file, 'r', encoding='utf-8') as reader:
                     text = reader.read()
@@ -47,8 +47,9 @@ class TextDataset(Dataset):
                 ids = self.tokenizer.encode(text).ids
 
             else:
-                ids = np.load(file)
+                ids = np.load(file, mmap_mode='r+')
                 ids = ids.f.arr_0
+                ids = ids.astype(np.int16)
             # store tokens
             self.encoded_tokens.append(ids)
             total_tokens += len(ids)
@@ -56,7 +57,7 @@ class TextDataset(Dataset):
             # store number of possible windows for this file, this is for presenting multiple files as one whole
             # subtract 1 window, for cases of small stride (e.g. stride=1)
             n_windows = ((len(ids) - sequence_length) // stride)
-            self.n_tokens_windows.append(n_windows)
+            self.n_tokens_windows[i] = n_windows
             self.length += n_windows
 
         print("Loaded dataset of", total_tokens, "tokens")
