@@ -348,3 +348,27 @@ However, 1024 is starting to approach the test length of 2048 (which was chosen 
 so the results may be less surprising with a test length of 4096 or even higher
 
 Especially as the meta-learning relative loss is not so much better than 512
+
+Finetuning:
+
+Fine-tuning models pre-trained for a while on short lengths to longer lengths for a small # of steps
+If training a model at length 256 for 99% of training time, and then finetune to 1024 for a few hundred steps works,
+then it becomes feasible to train powerful models on modest hardware, by reducing computation requirements 2x or more
+
+256 is 2x faster to train than 1024 with xsmall model on rtx 3090, but with larger models the gap should grow towards
+the theoretical limit of 16x (4x longer n, attention is n^2, so 16x longer training time)
+
+python finetune.py --model-size xsmall --train-ctx-len 512 --batch-size 64 --num-train-steps 25 --rel-pos-embed linear_cpb --load-ckpt xsmall_linear_cpb_128_1.pt --save-ckpt xsmall_linear_cpb_128_1_finetuned_512_25steps.pt  --seed 42 > xsmall_linear_cpb_128_1_finetuned_512_25steps.txt
+python finetune.py --model-size xsmall --train-ctx-len 512 --batch-size 64 --num-train-steps 100 --rel-pos-embed linear_cpb --load-ckpt xsmall_linear_cpb_128_1.pt --save-ckpt xsmall_linear_cpb_128_1_finetuned_512_100steps.pt  --seed 42 > xsmall_linear_cpb_128_1_finetuned_512_100steps.txt
+python finetune.py --model-size xsmall --train-ctx-len 512 --batch-size 64 --num-train-steps 200 --rel-pos-embed linear_cpb --load-ckpt xsmall_linear_cpb_128_1.pt --save-ckpt xsmall_linear_cpb_128_1_finetuned_512_200steps.pt  --seed 42 > xsmall_linear_cpb_128_1_finetuned_512_200steps.txt
+python finetune.py --model-size xsmall --train-ctx-len 512 --batch-size 64 --num-train-steps 500 --rel-pos-embed linear_cpb --load-ckpt xsmall_linear_cpb_128_1.pt --save-ckpt xsmall_linear_cpb_128_1_finetuned_512_500steps.pt  --seed 42 > xsmall_linear_cpb_128_1_finetuned_512_500steps.txt
+python finetune.py --model-size xsmall --train-ctx-len 512 --batch-size 64 --num-train-steps 1000 --rel-pos-embed linear_cpb --load-ckpt xsmall_linear_cpb_128_1.pt --save-ckpt xsmall_linear_cpb_128_1_finetuned_512_1000steps.pt  --seed 42 > xsmall_linear_cpb_128_1_finetuned_512_1000steps.txt
+
+python finetune.py --model-size xsmall --train-ctx-len 1024 --batch-size 32 --num-train-steps 25 --rel-pos-embed linear_cpb --load-ckpt xsmall_linear_cpb_128_1.pt --save-ckpt xsmall_linear_cpb_128_1_finetuned_1024_25steps.pt  --seed 42 > xsmall_linear_cpb_128_1_finetuned_1024_25steps.txt
+python finetune.py --model-size xsmall --train-ctx-len 1024 --batch-size 32 --num-train-steps 100 --rel-pos-embed linear_cpb --load-ckpt xsmall_linear_cpb_128_1.pt --save-ckpt xsmall_linear_cpb_128_1_finetuned_1024_100steps.pt  --seed 42 > xsmall_linear_cpb_128_1_finetuned_1024_100steps.txt
+python finetune.py --model-size xsmall --train-ctx-len 1024 --batch-size 32 --num-train-steps 200 --rel-pos-embed linear_cpb --load-ckpt xsmall_linear_cpb_128_1.pt --save-ckpt xsmall_linear_cpb_128_1_finetuned_1024_200steps.pt  --seed 42 > xsmall_linear_cpb_128_1_finetuned_1024_200steps.txt
+python finetune.py --model-size xsmall --train-ctx-len 1024 --batch-size 32 --num-train-steps 500 --rel-pos-embed linear_cpb --load-ckpt xsmall_linear_cpb_128_1.pt --save-ckpt xsmall_linear_cpb_128_1_finetuned_1024_500steps.pt  --seed 42 > xsmall_linear_cpb_128_1_finetuned_1024_500steps.txt
+python finetune.py --model-size xsmall --train-ctx-len 1024 --batch-size 32 --num-train-steps 1000 --rel-pos-embed linear_cpb --load-ckpt xsmall_linear_cpb_128_1.pt --save-ckpt xsmall_linear_cpb_128_1_finetuned_1024_1000steps.pt  --seed 42 > xsmall_linear_cpb_128_1_finetuned_1024_1000steps.txt
+
+
+python finetune.py --model-size xsmall --train-ctx-len 512 --batch-size 64 --num-train-steps 25 --rel-pos-embed linear_cpb --load-ckpt xsmall_linear_cpb_256_1.pt --save-ckpt xsmall_linear_cpb_256_1_finetuned_512_25steps.pt  --seed 42 > xsmall_linear_cpb_256_1_finetuned_512_25steps.txt
