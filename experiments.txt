@@ -317,9 +317,34 @@ Training some xsmall linear_cpb models:
 python train.py --model-size xsmall --train-ctx-len 128 --batch-size 256 --num-train-steps 200000 --rel-pos-embed linear_cpb --ckpt xsmall_linear_cpb_128_1.pt --seed 42 > xsmall_linear_cpb_128_1.txt
 python train.py --model-size xsmall --train-ctx-len 256 --batch-size 128 --num-train-steps 200000 --rel-pos-embed linear_cpb --ckpt xsmall_linear_cpb_256_1.pt --seed 42 > xsmall_linear_cpb_256_1.txt
 python train.py --model-size xsmall --train-ctx-len 512 --batch-size 64 --num-train-steps 200000 --rel-pos-embed linear_cpb --ckpt xsmall_linear_cpb_512_1.pt --seed 42 > xsmall_linear_cpb_512_1.txt
+python train.py --model-size xsmall --train-ctx-len 1024 --batch-size 32 --num-train-steps 200000 --rel-pos-embed linear_cpb --ckpt xsmall_linear_cpb_1024_1.pt --seed 42 > xsmall_linear_cpb_1024_1.txt
 
-Training some xsmall alibi models:
+Results:
+Length 128 had minimal meta-learning, and there was much noise.
+Additionally, the slope of loss was positive (after train length), so loss would increase with length
 
-python train.py --model-size xsmall --train-ctx-len 128 --batch-size 256 --num-train-steps 200000 --rel-pos-embed alibi --ckpt xsmall_alibi_128_1.pt --seed 42 > xsmall_alibi_128_1.txt
-python train.py --model-size xsmall --train-ctx-len 256 --batch-size 128 --num-train-steps 200000 --rel-pos-embed alibi --ckpt xsmall_alibi_256_1.pt --seed 42 > xsmall_alibi_256_1.txt
-python train.py --model-size xsmall --train-ctx-len 512 --batch-size 64 --num-train-steps 200000 --rel-pos-embed alibi --ckpt xsmall_alibi_512_1.pt --seed 42 > xsmall_alibi_512_1.txt
+Length 256 had much more metalearning, and lower noise, but not nearly as big a loss jump as Anthropic saw.
+This may be from multiple factors which I will list:
+1. Smaller training set, multiple epochs had to be done
+2. Smaller vocabulary / lower loss.
+Anthropic likely used a larger vocabulary (or harder dataset) as their loss was much higher.
+This means that the meta-learning loss should be smaller, relative to the training/testing loss'
+
+The slope was around -5.2e-6
+
+Length 512 had a decent jump in meta learning loss @ 500:
+-0.125 (256) to -0.163, around a 30% improvement.  Interestingly, it also took ~30% longer to train
+
+The slope did not improve much, only to around -5.9e-6
+
+Length 1024 was interesting.  The improvement in meta learning loss was not much, only to ~-.18
+
+Interestingly, the slope improved considerably, to around -8.2e-6.  Consdering that 256->512 was only ~.7 different,
+I would have expected somewhere closer to ~-7.3e-6 given a linear trend from 256 to 512, so the change is surprising.
+Additionally, given the large improvement between 128 and 256 (+3 -> -5), I expected a decaying improvement, so this
+jump was unexepected given the previous data.
+
+However, 1024 is starting to approach the test length of 2048 (which was chosen for compute/memory reasons),
+so the results may be less surprising with a test length of 4096 or even higher
+
+Especially as the meta-learning relative loss is not so much better than 512
